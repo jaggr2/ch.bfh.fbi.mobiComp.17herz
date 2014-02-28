@@ -10,8 +10,6 @@ import com.tinkerforge.Device;
 import com.tinkerforge.NotConnectedException;
 import com.tinkerforge.TimeoutException;
 
-import fridgeit.FridgeIt;
-
 /**
  * This class represents a TinkerforgeApplication which is responsible for
  * telling the difference of 'dark' and 'bright' ambience.
@@ -26,7 +24,7 @@ import fridgeit.FridgeIt;
  */
 public class AmbientLightApplication extends AbstractTinkerforgeApplication
 		implements IlluminanceReachedListener {
-	private final FridgeIt fridgeIt;
+	private final fridgeit.BaroApplication fridgeIt;
 	private BrickletAmbientLight ambientLightBricklet;
 	private boolean latestAnswerIsItDark;
 	private int ambientHistereseMin = 7;
@@ -38,7 +36,7 @@ public class AmbientLightApplication extends AbstractTinkerforgeApplication
 	 * @param frdidgeIt
 	 *            The Application to be informed onChange
 	 */
-	public AmbientLightApplication(final FridgeIt frdidgeIt) {
+	public AmbientLightApplication(final fridgeit.BaroApplication frdidgeIt) {
 		this.fridgeIt = frdidgeIt;
 	}
 

@@ -10,8 +10,6 @@ import com.tinkerforge.Device;
 import com.tinkerforge.NotConnectedException;
 import com.tinkerforge.TimeoutException;
 
-import fridgeit.FridgeIt;
-
 /**
  * This class represents a TinkerforgeApplication which is responsible for
  * telling the difference of 'near' and 'far' away.
@@ -26,7 +24,7 @@ import fridgeit.FridgeIt;
  */
 public class DistanceApplication extends AbstractTinkerforgeApplication
 		implements DistanceReachedListener {
-	private final FridgeIt fridgeIt;
+	private final fridgeit.BaroApplication fridgeIt;
 	private BrickletDistanceIR distanceIRBricklet;
 	private boolean latestAnswerIsItClosed;
 	private int distanceHistereseMin = 7;
@@ -38,7 +36,7 @@ public class DistanceApplication extends AbstractTinkerforgeApplication
 	 * @param frdidgeIt
 	 *            The Application to be informed onChange
 	 */
-	public DistanceApplication(final FridgeIt frdidgeIt) {
+	public DistanceApplication(final fridgeit.BaroApplication frdidgeIt) {
 		this.fridgeIt = frdidgeIt;
 	}
 

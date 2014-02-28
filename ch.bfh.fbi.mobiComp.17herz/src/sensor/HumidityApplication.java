@@ -10,8 +10,6 @@ import com.tinkerforge.BrickletHumidity.HumidityListener;
 import com.tinkerforge.Device;
 import com.tinkerforge.TinkerforgeException;
 
-import fridgeit.FridgeIt;
-
 /**
  * This class is responsible for receiving, processing and delegating data about
  * the relative ambient-humidity the {@link FridgeSensor} is sensing.
@@ -21,9 +19,9 @@ import fridgeit.FridgeIt;
  */
 public class HumidityApplication extends AbstractTinkerforgeApplication
 		implements HumidityListener {
-	private final FridgeIt fridgeIt;
+	private final fridgeit.BaroApplication fridgeIt;
 
-	public HumidityApplication(final FridgeIt fridgeIt) {
+	public HumidityApplication(final fridgeit.BaroApplication fridgeIt) {
 		this.fridgeIt = fridgeIt;
 	}
 

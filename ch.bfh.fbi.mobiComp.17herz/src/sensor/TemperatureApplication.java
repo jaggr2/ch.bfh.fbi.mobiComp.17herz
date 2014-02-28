@@ -10,8 +10,6 @@ import com.tinkerforge.BrickletTemperatureIR.ObjectTemperatureListener;
 import com.tinkerforge.Device;
 import com.tinkerforge.TinkerforgeException;
 
-import fridgeit.FridgeIt;
-
 /**
  * This class is responsible for receiving, processing and delegating data about
  * the ambient-temperature and Object-IR-temperature
@@ -21,9 +19,9 @@ import fridgeit.FridgeIt;
  */
 public class TemperatureApplication extends AbstractTinkerforgeApplication
 		implements ObjectTemperatureListener, AmbientTemperatureListener {
-	private final FridgeIt fridgeIt;
+	private final fridgeit.BaroApplication fridgeIt;
 
-	public TemperatureApplication(final FridgeIt fridgeIt) {
+	public TemperatureApplication(final fridgeit.BaroApplication fridgeIt) {
 		this.fridgeIt = fridgeIt;
 	}
 
@@ -65,7 +63,7 @@ public class TemperatureApplication extends AbstractTinkerforgeApplication
 	}
 
 	/**
-	 * It sends all data to the {@link FridgeIt}
+	 * It sends all data to the {@link fridgeit.BaroApplication}
 	 */
 	@Override
 	public void objectTemperature(final short temperature) {
@@ -73,7 +71,7 @@ public class TemperatureApplication extends AbstractTinkerforgeApplication
 	}
 
 	/**
-	 * It sends all data to the {@link FridgeIt}
+	 * It sends all data to the {@link fridgeit.BaroApplication}
 	 */
 	@Override
 	public void ambientTemperature(final short temperature) {

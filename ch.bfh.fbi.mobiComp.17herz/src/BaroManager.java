@@ -1,33 +1,26 @@
 import ch.quantasy.tinkerforge.tinker.agency.implementation.TinkerforgeStackAgency;
 import ch.quantasy.tinkerforge.tinker.agent.implementation.TinkerforgeStackAgentIdentifier;
 import ch.quantasy.tinkerforge.tinker.application.definition.TinkerforgeApplication;
-import fridgeit.FridgeIt;
 
 public class BaroManager {
-	// The 'server'-name of the fridge-sensor-stack
-	public final TinkerforgeStackAgentIdentifier FRIDGE_SENSOR = new TinkerforgeStackAgentIdentifier(
-			"192.168.43.224");
+
 	// Assumes to be connected via USB
-	public final TinkerforgeStackAgentIdentifier FRIDGE_VIEWER = new TinkerforgeStackAgentIdentifier(
-			"localhost");
-	private final TinkerforgeApplication fridgeIt;
+	public final TinkerforgeStackAgentIdentifier BARO_SENSOR = new TinkerforgeStackAgentIdentifier("localhost");
+
+	private final TinkerforgeApplication baroApp;
 
 	public BaroManager() {
-		this.fridgeIt = new FridgeIt();
+		this.baroApp = new BaroApplication();
 	}
 
 	public void start() {
-		TinkerforgeStackAgency.getInstance().getStackAgent(FRIDGE_VIEWER)
-				.addApplication(fridgeIt);
-		TinkerforgeStackAgency.getInstance().getStackAgent(FRIDGE_SENSOR)
-				.addApplication(fridgeIt);
+		TinkerforgeStackAgency.getInstance().getStackAgent(BARO_SENSOR)
+				.addApplication(baroApp);
 	}
 
 	public void stop() {
-		TinkerforgeStackAgency.getInstance().getStackAgent(FRIDGE_VIEWER)
-				.removeApplication(fridgeIt);
-		TinkerforgeStackAgency.getInstance().getStackAgent(FRIDGE_SENSOR)
-				.removeApplication(fridgeIt);
+		TinkerforgeStackAgency.getInstance().getStackAgent(BARO_SENSOR)
+				.removeApplication(baroApp);
 	}
 
 	/**
@@ -38,7 +31,7 @@ public class BaroManager {
 	 * @throws Exception
 	 */
 	public static void main(final String[] args) throws Exception {
-		final FridgeManager manager = new FridgeManager();
+		final BaroManager manager = new BaroManager();
 		manager.start();
 		System.in.read();
 		manager.stop();
