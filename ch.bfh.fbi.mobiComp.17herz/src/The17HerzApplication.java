@@ -14,15 +14,22 @@ public class The17HerzApplication extends AbstractTinkerforgeApplication {
     public BarometerApplication barometerApplication = null;
 
 	public The17HerzApplication() {
-        barometerApplication = new BarometerApplication("k5K");
-        super.addTinkerforgeApplication(barometerApplication);
-        super.addTinkerforgeApplication(new BarometerApplication("k6Y"));
 
 	}
 
 	@Override
 	public void deviceDisconnected(final TinkerforgeStackAgent tinkerforgeStackAgent, final Device device) {
-        System.out.println("Device " + device + " disconnected!");
+        try
+        {
+            if (TinkerforgeDevice.getDevice(device) == TinkerforgeDevice.Barometer)
+            {
+                //super.removeTinkerforgeApplication(new BarometerApplication(device.getIdentity().uid));
+            }
+
+            System.out.println("Device " + device + " ID: " + device.getIdentity().uid + " disconnected!");
+        }
+        catch (TinkerforgeException ex)
+        {}
 
 	}
 
@@ -30,6 +37,11 @@ public class The17HerzApplication extends AbstractTinkerforgeApplication {
 	public void deviceConnected(final TinkerforgeStackAgent tinkerforgeStackAgent, final Device device) {
         try
         {
+            if (TinkerforgeDevice.getDevice(device) == TinkerforgeDevice.Barometer)
+            {
+                super.addTinkerforgeApplication(new BarometerApplication(device.getIdentity().uid));
+            }
+
             System.out.println("Device " + device + " ID: " + device.getIdentity().uid + " connected!");
         }
         catch (TinkerforgeException ex)
