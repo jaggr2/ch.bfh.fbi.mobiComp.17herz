@@ -7,6 +7,7 @@ import com.tinkerforge.*;
 import com.tinkerforge.BrickletBarometer.AirPressureListener;
 import com.tinkerforge.BrickletBarometer.AltitudeListener;
 import com.tinkerforge.BrickletBarometer.AirPressureReachedListener;
+import main.The17HerzApplication;
 
 import java.text.*;
 import java.util.ArrayList;
@@ -131,7 +132,6 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
             {
                 int iThresholdValue = (int) (sum / aiCalibPoints.size());
                 setThreshold(iThresholdValue);
-                main.The17HerzApplication.logInfo("Neuer Kalibwert : " + iThresholdValue + " | Von: " + Id);
             }
         }
         else if (iActiveCalibPoint > iCalibrationPointsC)
@@ -162,12 +162,17 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
 
     public void setThreshold (int iAirPressure)
     {
-        try {
+        try
+        {
             barometer.setAirPressureCallbackThreshold('o', iAirPressure - iDiffC, iAirPressure + iDiffC);
-            System.out.println(dateFormat.format(new Date()) + ": Neuer Kalibwert : " + iAirPressure + " | Von: " + Id);
-        } catch (TimeoutException e) {
+            main.The17HerzApplication.logInfo("Neuer Kalibwert : " + iAirPressure + " | Von: " + Id);
+        }
+        catch (TimeoutException e)
+        {
             e.printStackTrace();
-        } catch (NotConnectedException e) {
+        }
+        catch (NotConnectedException e)
+        {
             e.printStackTrace();
         }
 
