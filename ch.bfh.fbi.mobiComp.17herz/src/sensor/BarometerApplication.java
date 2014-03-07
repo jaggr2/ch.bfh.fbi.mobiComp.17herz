@@ -23,9 +23,6 @@ import java.util.List;
 public class BarometerApplication extends AbstractTinkerforgeApplication
 		implements AirPressureListener, AltitudeListener, AirPressureReachedListener {
 
-    public static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
-
-
     public static String formatNumber(Integer number, String unit, double kommastellen) {
         double doubleNumber = (double)number / Math.pow(10, kommastellen);
 
@@ -134,7 +131,7 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
             {
                 int iThresholdValue = (int) (sum / aiCalibPoints.size());
                 setThreshold(iThresholdValue);
-                System.out.println(dateFormat.format(new Date()) + ": Neuer Kalibwert : " + iThresholdValue + " | Von: " + Id);
+                main.The17HerzApplication.logInfo("Neuer Kalibwert : " + iThresholdValue + " | Von: " + Id);
             }
         }
         else if (iActiveCalibPoint > iCalibrationPointsC)
@@ -195,7 +192,7 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
         try {
 
 
-            System.out.println(dateFormat.format(new Date()) + ": Ereignis bei " + formatNumber(iAirPressure, "mBar", 3) + " | Von: " + Id + barometer.getAirPressureCallbackThreshold().toString());
+            main.The17HerzApplication.logInfo("Ereignis bei " + formatNumber(iAirPressure, "mBar", 3) + " | Von: " + Id + barometer.getAirPressureCallbackThreshold().toString());
 
             setThreshold(iAirPressure);
 

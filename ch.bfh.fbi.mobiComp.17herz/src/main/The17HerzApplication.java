@@ -1,3 +1,5 @@
+package main;
+
 import ch.quantasy.tinkerforge.tinker.agency.implementation.TinkerforgeStackAgency;
 import ch.quantasy.tinkerforge.tinker.agent.implementation.TinkerforgeStackAgent;
 import ch.quantasy.tinkerforge.tinker.agent.implementation.TinkerforgeStackAgentIdentifier;
@@ -9,10 +11,14 @@ import sensor.BarometerApplication;
 import sensor.IDoorEventListener;
 import sensor.JoystickApplication;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 
 
 public class The17HerzApplication extends AbstractTinkerforgeApplication implements IDoorEventListener {
+
+    public static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
 
 
     public HashMap<String, AbstractTinkerforgeApplication> connectedApps = new HashMap<String, AbstractTinkerforgeApplication>();
@@ -103,5 +109,9 @@ public class The17HerzApplication extends AbstractTinkerforgeApplication impleme
     @Override
     public void doorEventHappend(BarometerApplication source) {
         System.out.println("doorEventHappend!");
+    }
+
+    public static void logInfo(String message) {
+        System.out.println("[" + dateFormat.format(new Date()) + "]" + message);
     }
 }
