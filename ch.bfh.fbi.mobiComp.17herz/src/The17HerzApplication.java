@@ -2,7 +2,9 @@ import ch.quantasy.tinkerforge.tinker.agency.implementation.TinkerforgeStackAgen
 import ch.quantasy.tinkerforge.tinker.agent.implementation.TinkerforgeStackAgent;
 import ch.quantasy.tinkerforge.tinker.agent.implementation.TinkerforgeStackAgentIdentifier;
 import ch.quantasy.tinkerforge.tinker.application.implementation.AbstractTinkerforgeApplication;
+import ch.quantasy.tinkerforge.tinker.core.implementation.TinkerforgeDevice;
 import com.tinkerforge.Device;
+import com.tinkerforge.TinkerforgeException;
 import sensor.BarometerApplication;
 
 
@@ -12,8 +14,9 @@ public class The17HerzApplication extends AbstractTinkerforgeApplication {
     public BarometerApplication barometerApplication = null;
 
 	public The17HerzApplication() {
-        barometerApplication = new BarometerApplication();
+        barometerApplication = new BarometerApplication("k5K");
         super.addTinkerforgeApplication(barometerApplication);
+        super.addTinkerforgeApplication(new BarometerApplication("k6Y"));
 
 	}
 
@@ -25,7 +28,12 @@ public class The17HerzApplication extends AbstractTinkerforgeApplication {
 
 	@Override
 	public void deviceConnected(final TinkerforgeStackAgent tinkerforgeStackAgent, final Device device) {
-        System.out.println("Device " + device + " connected!");
+        try
+        {
+            System.out.println("Device " + device + " ID: " + device.getIdentity().uid + " connected!");
+        }
+        catch (TinkerforgeException ex)
+        {}
 	}
 
 	@Override

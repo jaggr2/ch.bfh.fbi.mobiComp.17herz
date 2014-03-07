@@ -19,8 +19,17 @@ import com.tinkerforge.TinkerforgeException;
 public class BarometerApplication extends AbstractTinkerforgeApplication
 		implements AirPressureListener, AltitudeListener {
 
-	public BarometerApplication() {
+    private int iMaxAltitude = 0;
+    private int iMinAltitude = 500000;
 
+    private int iMaxAirPressure = 0;
+    private int iMinAirPressure = 10000000;
+
+    private String Id;
+    private String sUid;
+
+	public BarometerApplication(String sUid) {
+        this.sUid = sUid;
 	}
 
 	@Override
@@ -46,29 +55,51 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
 	public void deviceConnected(
 			final TinkerforgeStackAgent tinkerforgeStackAgent,
 			final Device device) {
-		if (TinkerforgeDevice.getDevice(device) == TinkerforgeDevice.Barometer) {
-            final BrickletBarometer barometerBrick = (BrickletBarometer) device;
-            barometerBrick.addAirPressureListener(this);
-            barometerBrick.addAltitudeListener(this);
+        try
+        {
+            if ((TinkerforgeDevice.getDevice(device) == TinkerforgeDevice.Barometer) &&
+                    device.getIdentity().uid.equalsIgnoreCase(sUid) ){
+                final BrickletBarometer barometerBrick = (BrickletBarometer) device;
+                barometerBrick.addAirPressureListener(this);
+                barometerBrick.addAltitudeListener(this);
 
-            try {
+                Id = device.getIdentity().toString();
                 barometerBrick.setAirPressureCallbackPeriod(500);
                 barometerBrick.setAltitudeCallbackPeriod(500);
-            } catch (final TinkerforgeException ex) {
-            }
 
-		}
+            }
+        }
+        catch (final TinkerforgeException ex) {
+        }
 	}
 
     @Override
-    public void airPressure(int i) {
-        System.out.println("Air Pressure: " + i);
+    public void airPressure(int iAirPressure) {
+        if (iAirPressure > iMaxAirPressure)
+        {
+            iMaxAirPressure = iAirPressure;
+            System.out.println("Air Pressure Max " + Id + ": " + iAirPressure);
+        }
+        if (iAirPressure < iMinAirPressure)
+        {
+            iMinAirPressure = iAirPressure;
+            System.out.println("Air Pressure Min " + Id + ": " + iAirPressure);
+        }
 
     }
 
     @Override
-    public void altitude(int i) {
-        System.out.println("Altitude: " + i);
+    public void altitude(int iAltitude) {
+        if (iAltitude > iMaxAltitude)
+        {
+            iMaxAltitude = iAltitude;
+            System.out.println("Altitude Max " + Id + ": " + iAltitude);
+        }
+        if (iAltitude < iMinAltitude)
+        {
+            iMinAltitude = iAltitude;
+            System.out.println("Altitude Min " + Id + ": " + iAltitude);
+        }
     }
 
 	@Override
