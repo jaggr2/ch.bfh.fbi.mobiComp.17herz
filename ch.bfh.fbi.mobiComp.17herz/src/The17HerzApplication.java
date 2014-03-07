@@ -53,7 +53,7 @@ public class The17HerzApplication extends AbstractTinkerforgeApplication {
 
         TinkerforgeStackAgency.getInstance().getStackAgent(BARO_SENSOR).addApplication(the17HerzApplication);
 
-        System.in.read();
+        System.in.read();  // read a character vom Console input
 
         TinkerforgeStackAgency.getInstance().getStackAgent(BARO_SENSOR).removeApplication(the17HerzApplication);
 

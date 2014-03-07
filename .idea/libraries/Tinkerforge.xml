@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="Tinkerforge">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/com.tinkerforge/lib/Tinkerforge.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
