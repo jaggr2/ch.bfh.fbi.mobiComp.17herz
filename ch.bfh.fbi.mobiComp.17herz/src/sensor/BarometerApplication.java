@@ -31,7 +31,7 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
 
     private  BrickletBarometer barometer;
 
-    private final int iDiffC = 200; //0.2 mBar
+    private final int iDiffC = 300; //0.3 mBar
 
 	public BarometerApplication(String sUid) {
         this.sUid = sUid;
@@ -120,7 +120,15 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
     @Override
     public void airPressureReached(int iAirPressure)
     {
-        System.out.println(new Date().toString() + "Ereigniss aufgetreten?  Bei :" + iAirPressure);
+        System.out.println(new Date().toString() + " Ereigniss aufgetreten!  Bei :" + iAirPressure);
+
+        try {
+            barometer.setAirPressureCallbackThreshold('o', iAirPressure - iDiffC, iAirPressure + iDiffC);
+        } catch (TimeoutException e) {
+            e.printStackTrace();
+        } catch (NotConnectedException e) {
+            e.printStackTrace();
+        }
     }
 
 	@Override
