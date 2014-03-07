@@ -1,3 +1,5 @@
+package main;
+
 import ch.quantasy.tinkerforge.tinker.agency.implementation.TinkerforgeStackAgency;
 import ch.quantasy.tinkerforge.tinker.agent.implementation.TinkerforgeStackAgent;
 import ch.quantasy.tinkerforge.tinker.agent.implementation.TinkerforgeStackAgentIdentifier;
@@ -6,12 +8,17 @@ import ch.quantasy.tinkerforge.tinker.core.implementation.TinkerforgeDevice;
 import com.tinkerforge.Device;
 import com.tinkerforge.TinkerforgeException;
 import sensor.BarometerApplication;
+import sensor.IDoorEventListener;
 import sensor.JoystickApplication;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 
 
-public class The17HerzApplication extends AbstractTinkerforgeApplication {
+public class The17HerzApplication extends AbstractTinkerforgeApplication implements IDoorEventListener {
+
+    public static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
 
 
     public HashMap<String, AbstractTinkerforgeApplication> connectedApps = new HashMap<String, AbstractTinkerforgeApplication>();
@@ -43,7 +50,9 @@ public class The17HerzApplication extends AbstractTinkerforgeApplication {
         {
             if (TinkerforgeDevice.getDevice(device) == TinkerforgeDevice.Barometer)
             {
-                addApplication(device.getIdentity().uid, new BarometerApplication(device.getIdentity().uid));
+                BarometerApplication app = new BarometerApplication(device.getIdentity().uid);
+                app.addDoorEventListener(this);
+                addApplication(device.getIdentity().uid, app);
             }
             else if(TinkerforgeDevice.getDevice(device) == TinkerforgeDevice.Joystick) {
                 addApplication(device.getIdentity().uid, new JoystickApplication(device.getIdentity().uid));
@@ -95,5 +104,14 @@ public class The17HerzApplication extends AbstractTinkerforgeApplication {
 
         TinkerforgeStackAgency.getInstance().getStackAgent(BARO_SENSOR).removeApplication(the17HerzApplication);
 
+    }
+
+    @Override
+    public void doorEventHappend(BarometerApplication source) {
+        System.out.println("doorEventHappend!");
+    }
+
+    public static void logInfo(String message) {
+        System.out.println("[" + dateFormat.format(new Date()) + "]" + message);
     }
 }
