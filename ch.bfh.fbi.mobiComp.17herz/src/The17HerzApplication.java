@@ -1,10 +1,12 @@
+import ch.quantasy.tinkerforge.tinker.agency.implementation.TinkerforgeStackAgency;
 import ch.quantasy.tinkerforge.tinker.agent.implementation.TinkerforgeStackAgent;
+import ch.quantasy.tinkerforge.tinker.agent.implementation.TinkerforgeStackAgentIdentifier;
 import ch.quantasy.tinkerforge.tinker.application.implementation.AbstractTinkerforgeApplication;
 import com.tinkerforge.Device;
 import sensor.BarometerApplication;
 
 
-public class BaroApplication extends AbstractTinkerforgeApplication {
+public class The17HerzApplication extends AbstractTinkerforgeApplication {
 	// A heuristic value representing the illuminance-threshold above which
 	// the light in the fridge is lit.
 	// Why is it not 0? The sensor gives some noise!
@@ -18,14 +20,14 @@ public class BaroApplication extends AbstractTinkerforgeApplication {
 	private static final int DOOR_IS_OPENED = 60;
 
 
-	private final BarometerApplication barometer;
+	//private final BarometerApplication barometer;
 	//private final DistanceApplication distance;
 	//private final HumidityApplication humidity;
 	//private final TemperatureApplication temperature;
 
-	public BaroApplication() {
+	public The17HerzApplication() {
 
-		this.barometer = new BarometerApplication(this);
+
 		//this.distance = new DistanceApplication(this);
 		//this.humidity = new HumidityApplication(this);
 		//this.temperature = new TemperatureApplication(this);
@@ -94,4 +96,23 @@ public class BaroApplication extends AbstractTinkerforgeApplication {
 		return this==obj;
 	}
 
+    // Assumes to be connected via USB
+    public static final TinkerforgeStackAgentIdentifier BARO_SENSOR = new TinkerforgeStackAgentIdentifier("localhost");
+
+    /**
+     * A simple boot-strap. The program will shut-down gracefully if one hits
+     * 'any' key on the console
+     *
+     * @param args
+     * @throws Exception
+     */
+    public static void main(final String[] args) throws Exception {
+        final The17HerzApplication application = new The17HerzApplication();
+        TinkerforgeStackAgency.getInstance().getStackAgent(BARO_SENSOR).addApplication(application);
+
+        System.in.read();
+
+        TinkerforgeStackAgency.getInstance().getStackAgent(BARO_SENSOR).removeApplication(application);
+
+    }
 }
