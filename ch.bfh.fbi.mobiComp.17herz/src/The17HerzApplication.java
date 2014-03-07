@@ -6,6 +6,7 @@ import ch.quantasy.tinkerforge.tinker.core.implementation.TinkerforgeDevice;
 import com.tinkerforge.Device;
 import com.tinkerforge.TinkerforgeException;
 import sensor.BarometerApplication;
+import sensor.JoystickApplication;
 
 import java.util.HashMap;
 
@@ -43,6 +44,9 @@ public class The17HerzApplication extends AbstractTinkerforgeApplication {
             if (TinkerforgeDevice.getDevice(device) == TinkerforgeDevice.Barometer)
             {
                 addApplication(device.getIdentity().uid, new BarometerApplication(device.getIdentity().uid));
+            }
+            else if(TinkerforgeDevice.getDevice(device) == TinkerforgeDevice.Joystick) {
+                addApplication(device.getIdentity().uid, new JoystickApplication(device.getIdentity().uid));
             }
             else {
                 System.out.println("INFO: Device " + device + " with ID " + device.getIdentity().uid + " has no connectable Application!");
