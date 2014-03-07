@@ -1,6 +1,7 @@
 import ch.quantasy.tinkerforge.tinker.agent.implementation.TinkerforgeStackAgent;
 import ch.quantasy.tinkerforge.tinker.application.implementation.AbstractTinkerforgeApplication;
 import com.tinkerforge.Device;
+import sensor.BarometerApplication;
 
 
 public class BaroApplication extends AbstractTinkerforgeApplication {
@@ -17,14 +18,14 @@ public class BaroApplication extends AbstractTinkerforgeApplication {
 	private static final int DOOR_IS_OPENED = 60;
 
 
-	//private final AmbientLightApplication ambientLight;
+	private final BarometerApplication barometer;
 	//private final DistanceApplication distance;
 	//private final HumidityApplication humidity;
 	//private final TemperatureApplication temperature;
 
 	public BaroApplication() {
 
-		//this.ambientLight = new AmbientLightApplication(this);
+		this.barometer = new BarometerApplication(this);
 		//this.distance = new DistanceApplication(this);
 		//this.humidity = new HumidityApplication(this);
 		//this.temperature = new TemperatureApplication(this);
