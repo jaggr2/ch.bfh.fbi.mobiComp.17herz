@@ -118,7 +118,6 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
             {
                 int iThresholdValue = (int) (sum / aiCalibPoints.size());
                 setThreshold(iThresholdValue);
-                System.out.println(dateFormat.format(new Date()) + ": Neuer Kalibwert : " + iThresholdValue + " | Von: " + Id);
             }
         }
         else if (iActiveCalibPoint > iCalibrationPointsC)
@@ -151,6 +150,7 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
     {
         try {
             barometer.setAirPressureCallbackThreshold('o', iAirPressure - iDiffC, iAirPressure + iDiffC);
+            System.out.println(dateFormat.format(new Date()) + ": Neuer Kalibwert : " + iAirPressure + " | Von: " + Id);
         } catch (TimeoutException e) {
             e.printStackTrace();
         } catch (NotConnectedException e) {
@@ -182,10 +182,13 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
             System.out.println(dateFormat.format(new Date()) + ": Ereignis bei " + formatNumber(iAirPressure, "mBar", 3) + " | Von: " + Id + barometer.getAirPressureCallbackThreshold().toString());
 
             setThreshold(iAirPressure);
-
-        } catch (TimeoutException e) {
+        }
+        catch (TimeoutException e)
+        {
             e.printStackTrace();
-        } catch (NotConnectedException e) {
+        }
+        catch (NotConnectedException e)
+        {
             e.printStackTrace();
         }
     }
