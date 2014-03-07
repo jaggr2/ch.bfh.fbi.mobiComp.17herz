@@ -8,6 +8,7 @@ import com.tinkerforge.BrickletBarometer.AirPressureListener;
 import com.tinkerforge.BrickletBarometer.AltitudeListener;
 import com.tinkerforge.BrickletBarometer.AirPressureReachedListener;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -19,6 +20,8 @@ import java.util.Date;
  */
 public class BarometerApplication extends AbstractTinkerforgeApplication
 		implements AirPressureListener, AltitudeListener, AirPressureReachedListener {
+
+    public static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
 
     private int iMaxAltitude = 0;
     private int iMinAltitude = 500000;
@@ -117,7 +120,7 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
     {
         try {
 
-            System.out.println(new Date().toString() + " Ereigniss aufgetreten!  Bei: " + iAirPressure + " Von: " + Id + barometer.getAirPressureCallbackThreshold().toString());
+            System.out.println(dateFormat.format(new Date()) + ": Ereigniss aufgetreten!  Bei: " + iAirPressure + " Von: " + Id + barometer.getAirPressureCallbackThreshold().toString());
 
             barometer.setAirPressureCallbackThreshold('o', iAirPressure - iDiffC, iAirPressure + iDiffC);
         } catch (TimeoutException e) {
