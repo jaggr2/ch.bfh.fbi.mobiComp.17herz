@@ -49,12 +49,13 @@ public class The17HerzApplication extends AbstractTinkerforgeApplication {
      * @throws Exception
      */
     public static void main(final String[] args) throws Exception {
-        final The17HerzApplication application = new The17HerzApplication();
-        TinkerforgeStackAgency.getInstance().getStackAgent(BARO_SENSOR).addApplication(application);
+        final The17HerzApplication the17HerzApplication = new The17HerzApplication();
+
+        TinkerforgeStackAgency.getInstance().getStackAgent(BARO_SENSOR).addApplication(the17HerzApplication);
 
         System.in.read();
 
-        TinkerforgeStackAgency.getInstance().getStackAgent(BARO_SENSOR).removeApplication(application);
+        TinkerforgeStackAgency.getInstance().getStackAgent(BARO_SENSOR).removeApplication(the17HerzApplication);
 
     }
 }
