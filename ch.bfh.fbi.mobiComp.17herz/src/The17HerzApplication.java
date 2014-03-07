@@ -44,6 +44,9 @@ public class The17HerzApplication extends AbstractTinkerforgeApplication {
             {
                 addApplication(device.getIdentity().uid, new BarometerApplication(device.getIdentity().uid));
             }
+            else {
+                System.out.println("INFO: Device " + device + " with ID " + device.getIdentity().uid + " has no connectable Application!");
+            }
         }
         catch (TinkerforgeException ex)
         {
