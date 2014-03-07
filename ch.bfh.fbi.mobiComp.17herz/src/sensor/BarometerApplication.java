@@ -3,11 +3,12 @@ package sensor;
 import ch.quantasy.tinkerforge.tinker.agent.implementation.TinkerforgeStackAgent;
 import ch.quantasy.tinkerforge.tinker.application.implementation.AbstractTinkerforgeApplication;
 import ch.quantasy.tinkerforge.tinker.core.implementation.TinkerforgeDevice;
-import com.tinkerforge.BrickletBarometer;
+import com.tinkerforge.*;
 import com.tinkerforge.BrickletBarometer.AirPressureListener;
 import com.tinkerforge.BrickletBarometer.AltitudeListener;
-import com.tinkerforge.Device;
-import com.tinkerforge.TinkerforgeException;
+import com.tinkerforge.BrickletBarometer.AirPressureReachedListener;
+
+import java.util.Date;
 
 /**
  * This class is responsible for receiving, processing and delegating data about
@@ -17,7 +18,7 @@ import com.tinkerforge.TinkerforgeException;
  * 
  */
 public class BarometerApplication extends AbstractTinkerforgeApplication
-		implements AirPressureListener, AltitudeListener {
+		implements AirPressureListener, AltitudeListener, AirPressureReachedListener {
 
     private int iMaxAltitude = 0;
     private int iMinAltitude = 500000;
@@ -28,6 +29,10 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
     private String Id;
     private String sUid;
 
+    private  BrickletBarometer barometer;
+
+    private final int iDiffC = 300; //0.3 mBar
+
 	public BarometerApplication(String sUid) {
         this.sUid = sUid;
 	}
@@ -36,8 +41,10 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
 	public void deviceDisconnected(
 			final TinkerforgeStackAgent tinkerforgeStackAgent,
 			final Device device) {
-		if (TinkerforgeDevice.getDevice(device) == TinkerforgeDevice.Barometer) {
+		if (TinkerforgeDevice.getDevice(device) == TinkerforgeDevice.Barometer)
+        {
 			final BrickletBarometer barometerBrick = (BrickletBarometer) device;
+            barometer = null;
             barometerBrick.removeAirPressureListener(this);
             barometerBrick.removeAltitudeListener(this);
 
@@ -58,14 +65,15 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
         try
         {
             if ((TinkerforgeDevice.getDevice(device) == TinkerforgeDevice.Barometer) &&
-                    device.getIdentity().uid.equalsIgnoreCase(sUid) ){
-                final BrickletBarometer barometerBrick = (BrickletBarometer) device;
-                barometerBrick.addAirPressureListener(this);
-                barometerBrick.addAltitudeListener(this);
+                    device.getIdentity().uid.equalsIgnoreCase(sUid) )
+            {
+                barometer = (BrickletBarometer) device;
+                barometer.addAirPressureListener(this);
+                barometer.addAltitudeListener(this);
+                barometer.addAirPressureReachedListener(this);
 
-                Id = device.getIdentity().toString();
-                barometerBrick.setAirPressureCallbackPeriod(500);
-                barometerBrick.setAltitudeCallbackPeriod(500);
+                Id = device.getIdentity().uid;
+                barometer.setAirPressureCallbackPeriod(2000);
 
             }
         }
@@ -78,12 +86,19 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
         if (iAirPressure > iMaxAirPressure)
         {
             iMaxAirPressure = iAirPressure;
-            System.out.println("Air Pressure Max " + Id + ": " + iAirPressure);
+            //System.out.println(new Date().toString() + ": Air Pressure Max " + Id + ": " + iAirPressure);
         }
         if (iAirPressure < iMinAirPressure)
         {
             iMinAirPressure = iAirPressure;
-            System.out.println("Air Pressure Min " + Id + ": " + iAirPressure);
+            //System.out.println(new Date().toString() + ": Air Pressure Min " + Id + ": " + iAirPressure);
+        }
+        try {
+            barometer.setAirPressureCallbackThreshold('o', iAirPressure - iDiffC, iAirPressure + iDiffC);
+        } catch (TimeoutException e) {
+            e.printStackTrace();
+        } catch (NotConnectedException e) {
+            e.printStackTrace();
         }
 
     }
@@ -93,12 +108,26 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
         if (iAltitude > iMaxAltitude)
         {
             iMaxAltitude = iAltitude;
-            System.out.println("Altitude Max " + Id + ": " + iAltitude);
+            //System.out.println(new Date().toString() + ": Altitude Max " + Id + ": " + iAltitude);
         }
         if (iAltitude < iMinAltitude)
         {
             iMinAltitude = iAltitude;
-            System.out.println("Altitude Min " + Id + ": " + iAltitude);
+            //System.out.println(new Date().toString() + ": Altitude Min " + Id + ": " + iAltitude);
+        }
+    }
+
+    @Override
+    public void airPressureReached(int iAirPressure)
+    {
+        System.out.println(new Date().toString() + " Ereigniss aufgetreten!  Bei :" + iAirPressure);
+
+        try {
+            barometer.setAirPressureCallbackThreshold('o', iAirPressure - iDiffC, iAirPressure + iDiffC);
+        } catch (TimeoutException e) {
+            e.printStackTrace();
+        } catch (NotConnectedException e) {
+            e.printStackTrace();
         }
     }
 
