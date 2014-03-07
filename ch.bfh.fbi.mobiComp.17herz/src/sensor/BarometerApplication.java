@@ -47,12 +47,7 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
             barometer = null;
             barometerBrick.removeAirPressureListener(this);
             barometerBrick.removeAltitudeListener(this);
-
-			try {
-                barometerBrick.setAirPressureCallbackPeriod(500);
-                barometerBrick.setAltitudeCallbackPeriod(500);
-			} catch (final TinkerforgeException ex) {
-			}
+            barometerBrick.removeAirPressureReachedListener(this);
 
 		}
 

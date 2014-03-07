@@ -48,6 +48,7 @@ public class JoystickApplication extends AbstractTinkerforgeApplication
                     device.getIdentity().uid.equalsIgnoreCase(sUid) ){
                 final BrickletJoystick joystickBrick = (BrickletJoystick) device;
                 joystickBrick.addPressedListener(this);
+                joystickBrick.addPositionReachedListener(this);
 
                 Id = device.getIdentity().toString();
 
