@@ -7,30 +7,33 @@ import com.tinkerforge.Device;
 import com.tinkerforge.TinkerforgeException;
 import sensor.BarometerApplication;
 
+import java.util.HashMap;
+
 
 public class The17HerzApplication extends AbstractTinkerforgeApplication {
 
 
-    public BarometerApplication barometerApplication = null;
-
-	public The17HerzApplication() {
-
-	}
+    public HashMap<String, AbstractTinkerforgeApplication> connectedApps = new HashMap<String, AbstractTinkerforgeApplication>();
 
 	@Override
 	public void deviceDisconnected(final TinkerforgeStackAgent tinkerforgeStackAgent, final Device device) {
         try
         {
-            if (TinkerforgeDevice.getDevice(device) == TinkerforgeDevice.Barometer)
-            {
-                //super.removeTinkerforgeApplication(new BarometerApplication(device.getIdentity().uid));
-            }
+            String uid = device.getIdentity().uid;
 
-            System.out.println("Device " + device + " ID: " + device.getIdentity().uid + " disconnected!");
+            if(connectedApps.containsKey(uid)) {
+                super.removeTinkerforgeApplication(connectedApps.get(uid));
+                connectedApps.remove(uid);
+                System.out.println("Device " + device + " ID: " + uid + " disconnected and connected application removed!");
+            }
+            else {
+                System.out.println("Device " + device + " ID: " + uid + " disconnected without connected application!");
+            }
         }
         catch (TinkerforgeException ex)
-        {}
-
+        {
+            System.out.println("ERROR: Failed to disconnect Device " + device + "!");
+        }
 	}
 
 	@Override
@@ -39,14 +42,25 @@ public class The17HerzApplication extends AbstractTinkerforgeApplication {
         {
             if (TinkerforgeDevice.getDevice(device) == TinkerforgeDevice.Barometer)
             {
-                super.addTinkerforgeApplication(new BarometerApplication(device.getIdentity().uid));
+                addApplication(device.getIdentity().uid, new BarometerApplication(device.getIdentity().uid));
             }
-
-            System.out.println("Device " + device + " ID: " + device.getIdentity().uid + " connected!");
+            else {
+                System.out.println("INFO: Device " + device + " with ID " + device.getIdentity().uid + " has no connectable Application!");
+            }
         }
         catch (TinkerforgeException ex)
-        {}
+        {
+            System.out.println("ERROR: Failed to connect Device " + device + "!");
+        }
 	}
+
+    public void addApplication(final String uid, final AbstractTinkerforgeApplication newApplication) {
+        connectedApps.put(uid, newApplication);
+
+        super.addTinkerforgeApplication(newApplication);
+
+        System.out.println("Application  " + newApplication + " connected with Device ID: " + uid + " !");
+    }
 
 	@Override
 	public int hashCode() {
