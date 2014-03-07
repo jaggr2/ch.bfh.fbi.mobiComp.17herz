@@ -6,12 +6,13 @@ import ch.quantasy.tinkerforge.tinker.core.implementation.TinkerforgeDevice;
 import com.tinkerforge.Device;
 import com.tinkerforge.TinkerforgeException;
 import sensor.BarometerApplication;
+import sensor.IDoorEventListener;
 import sensor.JoystickApplication;
 
 import java.util.HashMap;
 
 
-public class The17HerzApplication extends AbstractTinkerforgeApplication {
+public class The17HerzApplication extends AbstractTinkerforgeApplication implements IDoorEventListener {
 
 
     public HashMap<String, AbstractTinkerforgeApplication> connectedApps = new HashMap<String, AbstractTinkerforgeApplication>();
@@ -43,7 +44,9 @@ public class The17HerzApplication extends AbstractTinkerforgeApplication {
         {
             if (TinkerforgeDevice.getDevice(device) == TinkerforgeDevice.Barometer)
             {
-                addApplication(device.getIdentity().uid, new BarometerApplication(device.getIdentity().uid));
+                BarometerApplication app = new BarometerApplication(device.getIdentity().uid);
+                app.addDoorEventListener(this);
+                addApplication(device.getIdentity().uid, app);
             }
             else if(TinkerforgeDevice.getDevice(device) == TinkerforgeDevice.Joystick) {
                 addApplication(device.getIdentity().uid, new JoystickApplication(device.getIdentity().uid));
@@ -95,5 +98,10 @@ public class The17HerzApplication extends AbstractTinkerforgeApplication {
 
         TinkerforgeStackAgency.getInstance().getStackAgent(BARO_SENSOR).removeApplication(the17HerzApplication);
 
+    }
+
+    @Override
+    public void doorEventHappend(BarometerApplication source) {
+        System.out.println("doorEventHappend!");
     }
 }

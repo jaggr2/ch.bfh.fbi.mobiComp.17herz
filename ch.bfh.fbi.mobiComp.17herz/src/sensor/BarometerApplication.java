@@ -11,6 +11,7 @@ import com.tinkerforge.BrickletBarometer.AirPressureReachedListener;
 import java.text.*;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * This class is responsible for receiving, processing and delegating data about
@@ -25,12 +26,27 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
     public static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
 
 
-
     public static String formatNumber(Integer number, String unit, double kommastellen) {
         double doubleNumber = (double)number / Math.pow(10, kommastellen);
 
         return (new DecimalFormat("#,###,##0.000")).format(doubleNumber) + unit;
     }
+
+    private final List<IDoorEventListener> eventListeners = new ArrayList<IDoorEventListener>();
+
+    public void addDoorEventListener( IDoorEventListener listener )
+    {
+        if ( ! eventListeners.contains( listener ) ) {
+            eventListeners.add( listener );
+        }
+    }
+
+    public void removeDoorEventListener( IDoorEventListener observer )
+    {
+        eventListeners.remove( observer );
+    }
+
+
 
     private int iMaxAltitude = 0;
     private int iMinAltitude = 500000;
