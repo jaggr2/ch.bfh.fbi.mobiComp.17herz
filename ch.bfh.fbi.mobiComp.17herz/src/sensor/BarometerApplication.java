@@ -9,6 +9,7 @@ import com.tinkerforge.BrickletBarometer.AltitudeListener;
 import com.tinkerforge.BrickletBarometer.AirPressureReachedListener;
 
 import java.text.*;
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -22,6 +23,7 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
 		implements AirPressureListener, AltitudeListener, AirPressureReachedListener {
 
     public static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
+
 
 
     public static String formatNumber(Integer number, String unit, double kommastellen) {
@@ -40,8 +42,13 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
     private String sUid;
 
     private  BrickletBarometer barometer;
+    private int iActiveCalibPoint = 0;
 
     private final int iDiffC = 200; //0.2 mBar
+    private final int iCalibrationPointsC = 40;
+    private final int iCalibrationPointDelayC = 50;
+    private final int iCalibrationDelayC = 60000;
+    private ArrayList<Integer> aiCalibPoints = new ArrayList<Integer>() ;
 
 	public BarometerApplication(String sUid) {
         this.sUid = sUid;
@@ -78,7 +85,7 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
                 barometer.addAirPressureReachedListener(this);
 
                 Id = device.getIdentity().uid;
-                barometer.setAirPressureCallbackPeriod(2000);
+                barometer.setAirPressureCallbackPeriod(iCalibrationPointDelayC);
 
             }
         }
@@ -98,6 +105,50 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
             iMinAirPressure = iAirPressure;
             //System.out.println(new Date().toString() + ": Air Pressure Min " + Id + ": " + iAirPressure);
         }
+
+        if (++iActiveCalibPoint == iCalibrationPointsC)
+        {
+            // Durchschnitt der Kalibrationspunkte errechnen
+            long sum = 0;
+            for (Integer point: aiCalibPoints)
+            {
+                sum += point;
+            }
+            if (aiCalibPoints.size() > 0)
+            {
+                int iThresholdValue = (int) (sum / aiCalibPoints.size());
+                setThreshold(iThresholdValue);
+                System.out.println(dateFormat.format(new Date()) + ": Neuer Kalibwert : " + iThresholdValue + " | Von: " + Id);
+            }
+        }
+        else if (iActiveCalibPoint > iCalibrationPointsC)
+        {
+            // Kalibration zurücksetzen
+            iActiveCalibPoint  = 0;
+            aiCalibPoints.clear();
+            try
+            {
+                barometer.setAirPressureCallbackPeriod(iCalibrationDelayC);
+            }
+            catch (TimeoutException e)
+            {
+                e.printStackTrace();
+            }
+            catch (NotConnectedException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        else
+        {
+            aiCalibPoints.add(iAirPressure);
+        }
+
+    }
+
+
+    public void setThreshold (int iAirPressure)
+    {
         try {
             barometer.setAirPressureCallbackThreshold('o', iAirPressure - iDiffC, iAirPressure + iDiffC);
         } catch (TimeoutException e) {
@@ -130,7 +181,8 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
 
             System.out.println(dateFormat.format(new Date()) + ": Ereignis bei " + formatNumber(iAirPressure, "mBar", 3) + " | Von: " + Id + barometer.getAirPressureCallbackThreshold().toString());
 
-            barometer.setAirPressureCallbackThreshold('o', iAirPressure - iDiffC, iAirPressure + iDiffC);
+            setThreshold(iAirPressure);
+
         } catch (TimeoutException e) {
             e.printStackTrace();
         } catch (NotConnectedException e) {
