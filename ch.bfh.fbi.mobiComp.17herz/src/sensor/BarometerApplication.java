@@ -28,13 +28,13 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
 			final TinkerforgeStackAgent tinkerforgeStackAgent,
 			final Device device) {
 		if (TinkerforgeDevice.getDevice(device) == TinkerforgeDevice.Barometer) {
-			final BrickletBarometer tempIR = (BrickletBarometer) device;
-			tempIR.removeAirPressureListener(this);
-			tempIR.removeAltitudeListener(this);
+			final BrickletBarometer barometerBrick = (BrickletBarometer) device;
+            barometerBrick.removeAirPressureListener(this);
+            barometerBrick.removeAltitudeListener(this);
 
 			try {
-				tempIR.setAirPressureCallbackPeriod(500);
-				tempIR.setAltitudeCallbackPeriod(500);
+                barometerBrick.setAirPressureCallbackPeriod(500);
+                barometerBrick.setAltitudeCallbackPeriod(500);
 			} catch (final TinkerforgeException ex) {
 			}
 
@@ -47,13 +47,13 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
 			final TinkerforgeStackAgent tinkerforgeStackAgent,
 			final Device device) {
 		if (TinkerforgeDevice.getDevice(device) == TinkerforgeDevice.Barometer) {
-            final BrickletBarometer tempIR = (BrickletBarometer) device;
-            tempIR.removeAirPressureListener(this);
-            tempIR.removeAltitudeListener(this);
+            final BrickletBarometer barometerBrick = (BrickletBarometer) device;
+            barometerBrick.addAirPressureListener(this);
+            barometerBrick.addAltitudeListener(this);
 
             try {
-                tempIR.setAirPressureCallbackPeriod(500);
-                tempIR.setAltitudeCallbackPeriod(500);
+                barometerBrick.setAirPressureCallbackPeriod(500);
+                barometerBrick.setAltitudeCallbackPeriod(500);
             } catch (final TinkerforgeException ex) {
             }
 
