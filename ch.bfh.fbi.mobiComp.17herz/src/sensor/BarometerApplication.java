@@ -22,7 +22,7 @@ import java.util.List;
  * 
  */
 public class BarometerApplication extends AbstractTinkerforgeApplication
-		implements AirPressureListener, AltitudeListener, AirPressureReachedListener {
+		implements AirPressureListener, AirPressureReachedListener {
 
     public static String formatNumber(Integer number, String unit, double kommastellen) {
         double doubleNumber = (double)number / Math.pow(10, kommastellen);
@@ -77,9 +77,8 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
 			final BrickletBarometer barometerBrick = (BrickletBarometer) device;
             barometer = null;
             barometerBrick.removeAirPressureListener(this);
-            barometerBrick.removeAltitudeListener(this);
+            //barometerBrick.removeAltitudeListener(this);
             barometerBrick.removeAirPressureReachedListener(this);
-
 		}
 
 	}
@@ -95,7 +94,7 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
             {
                 barometer = (BrickletBarometer) device;
                 barometer.addAirPressureListener(this);
-                barometer.addAltitudeListener(this);
+                //barometer.addAltitudeListener(this);
                 barometer.addAirPressureReachedListener(this);
 
                 Id = device.getIdentity().uid;
@@ -176,20 +175,6 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
             e.printStackTrace();
         }
 
-    }
-
-    @Override
-    public void altitude(int iAltitude) {
-        if (iAltitude > iMaxAltitude)
-        {
-            iMaxAltitude = iAltitude;
-            //System.out.println(new Date().toString() + ": Altitude Max " + Id + ": " + iAltitude);
-        }
-        if (iAltitude < iMinAltitude)
-        {
-            iMinAltitude = iAltitude;
-            //System.out.println(new Date().toString() + ": Altitude Min " + Id + ": " + iAltitude);
-        }
     }
 
     @Override
