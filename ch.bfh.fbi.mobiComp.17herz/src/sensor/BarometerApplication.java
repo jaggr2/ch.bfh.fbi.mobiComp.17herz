@@ -141,6 +141,9 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
             // Kalibration zurücksetzen
             iActiveCalibPoint  = 0;
             aiCalibPoints.clear();
+
+            main.The17HerzApplication.logInfo("Calibration reseted [SensorID=" + Id + "]" );
+
             try
             {
                 barometer.setAirPressureCallbackPeriod(iCalibrationDelayC);
@@ -157,6 +160,7 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
         else
         {
             aiCalibPoints.add(iAirPressure);
+            main.The17HerzApplication.logInfo("Add Calibration point [id=" + Id + ", value="+ iAirPressure + ", iActiveCalibPoint=" + iActiveCalibPoint + "]");
 
             if (iActiveCalibPoint == 1) {
                 main.The17HerzApplication.logInfo("Calibration started [SensorID=" + Id + ", ReferenceValue=" + aiCalibPoints.get(0) + ", maxDiff=" + iDiffC + ", MeasureInterval=" + iCalibrationPointDelayC + "]" );
