@@ -45,7 +45,7 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
     private String sUid;
 
     private BrickletBarometer barometer;
-    private boolean waitForCalib = false;
+    private boolean waitForCalib = true;
 
     private final int iDiffC = 200; //0.2 mBar
     private final int iCalibrationPointDelayC = 5;
@@ -157,9 +157,10 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
     {
 
         Object lock = new Object();
-        private final long lCalibDurationC = 2000;
+        private final long lCalibDurationC = 3000;
         private final Integer iCalibDiffC = 50;
         private long StartTime;
+        private boolean calibInProgress;
 
         private ArrayList<Integer> aiCalibPoints = new ArrayList<Integer>() ;
 
@@ -170,6 +171,13 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
         @Override
         public void run()
         {
+            if (calibInProgress)
+            {
+                return;
+            }
+
+            calibInProgress = true;
+
             try
             {
                 barometer.setAirPressureCallbackPeriod(iCalibrationPointDelayC);
@@ -231,6 +239,8 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
             {
                 e.printStackTrace();
             }
+
+            calibInProgress = false;
         }
 
         @Override
