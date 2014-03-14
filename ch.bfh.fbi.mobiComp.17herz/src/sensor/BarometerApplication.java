@@ -114,13 +114,13 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
             {
                 main.The17HerzApplication.logInfo("Ereignis bei " + formatNumber(iAirPressure, "mBar", 3) + " | Von: " + Id + barometer.getAirPressureCallbackThreshold().toString());
 
-                new Thread(barometerCalibration).start();
-
-                waitForCalib = true;
-
                 for(IDoorEventListener listener : eventListeners) {
                     listener.doorEventHappend(this, iAirPressure);
                 }
+
+                new Thread(barometerCalibration).start();
+
+                waitForCalib = true;
             }
         }
         catch (TimeoutException e)
