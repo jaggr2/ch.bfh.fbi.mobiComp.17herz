@@ -6,6 +6,8 @@ import ch.quantasy.tinkerforge.tinker.agent.implementation.TinkerforgeStackAgent
 import ch.quantasy.tinkerforge.tinker.application.implementation.AbstractTinkerforgeApplication;
 import ch.quantasy.tinkerforge.tinker.core.implementation.TinkerforgeDevice;
 import com.tinkerforge.Device;
+import com.tinkerforge.NotConnectedException;
+import com.tinkerforge.TimeoutException;
 import com.tinkerforge.TinkerforgeException;
 import sensor.BarometerApplication;
 import sensor.IDoorEventListener;
@@ -14,6 +16,7 @@ import sensor.JoystickApplication;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 
 public class The17HerzApplication extends AbstractTinkerforgeApplication implements IDoorEventListener {
@@ -101,9 +104,103 @@ public class The17HerzApplication extends AbstractTinkerforgeApplication impleme
 
     }
 
+    LinkedList<DoorEvent> events = new LinkedList<DoorEvent>() ;
+
     @Override
     public void doorEventHappend(BarometerApplication source, Integer airPressure) {
-        System.out.println("doorEventHappend!");
+
+        DoorEvent currentEvent = new DoorEvent(source, airPressure);
+
+
+        // check last events
+        if(events.size() == 0) {
+            currentEvent.logEvent();
+        }
+        else if(events.size() > 0) {
+
+            // get last event from same sensor
+//            for(DoorEvent event : events) {
+//                if(event.getBarometerId().equals(currentEvent.getBarometerId())) {
+//
+//                }
+//            }
+        }
+
+        events.add(currentEvent);
+    }
+
+
+    private class DoorEvent {
+
+        private Date timestamp;
+        private Integer airPressure;
+        private String barometerId;
+        private Integer threshold;
+        private Integer thresholdMin;
+        private Integer thresholdMax;
+        private Boolean isUp;
+
+        private DoorEvent(BarometerApplication barometer, Integer airPressure) {
+            this.timestamp = new Date();
+            this.airPressure = airPressure;
+            this.barometerId = barometer.getId();
+            try {
+                this.thresholdMax = barometer.getBarometer().getAirPressureCallbackThreshold().max;
+                this.thresholdMin = barometer.getBarometer().getAirPressureCallbackThreshold().min;
+                this.threshold = (thresholdMax + thresholdMin) / 2;
+            } catch (TimeoutException e) {
+                e.printStackTrace();
+            } catch (NotConnectedException e) {
+                e.printStackTrace();
+            }
+
+            isUp = this.threshold < airPressure;
+        }
+
+        public Date getTimestamp() {
+            return timestamp;
+        }
+
+        public Integer getAirPressure() {
+            return airPressure;
+        }
+
+        public String getBarometerId() {
+            return barometerId;
+        }
+
+        public Integer getThreshold() {
+            return threshold;
+        }
+
+        public Integer getThresholdMin() {
+            return thresholdMin;
+        }
+
+        public Integer getThresholdMax() {
+            return thresholdMax;
+        }
+
+        public Boolean getIsUp() {
+            return isUp;
+        }
+
+        public void logEvent() {
+            logInfo((isUp ? "Close" : "Open") + " detected! " + this);
+        }
+
+        @Override
+        public String toString() {
+            return "DoorEvent{" +
+                    "timestamp=" + timestamp +
+                    ", airPressure=" + airPressure +
+                    ", barometerId='" + barometerId + '\'' +
+                    ", threshold=" + threshold +
+                    ", thresholdMin=" + thresholdMin +
+                    ", thresholdMax=" + thresholdMax +
+                    ", isUp=" + isUp +
+                    '}';
+        }
     }
 
     public static void logInfo(String message) {

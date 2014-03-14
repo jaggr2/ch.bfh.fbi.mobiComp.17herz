@@ -60,7 +60,15 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
         CalibTimer = new Timer();
 	}
 
-	@Override
+    public BrickletBarometer getBarometer() {
+        return barometer;
+    }
+
+    public String getId() {
+        return Id;
+    }
+
+    @Override
 	public void deviceDisconnected(
 			final TinkerforgeStackAgent tinkerforgeStackAgent,
 			final Device device) {
