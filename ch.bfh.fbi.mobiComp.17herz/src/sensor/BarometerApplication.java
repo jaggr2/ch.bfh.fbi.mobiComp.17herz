@@ -130,6 +130,9 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
             if (aiCalibPoints.size() > 0)
             {
                 int iThresholdValue = (int) (sum / aiCalibPoints.size());
+
+                main.The17HerzApplication.logInfo("Calibration succeeded [SensorID=" + Id + ", NewThresholdValue=" + iThresholdValue + ", MeasurePointCount=" + aiCalibPoints.size() + "]" );
+
                 setThreshold(iThresholdValue);
             }
         }
@@ -156,7 +159,7 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
             aiCalibPoints.add(iAirPressure);
 
             if (iActiveCalibPoint == 1) {
-                main.The17HerzApplication.logInfo("Calibration started [ReferenceValue=" + aiCalibPoints.get(0) + ", maxDiff=" + iDiffC + "]" );
+                main.The17HerzApplication.logInfo("Calibration started [SensorID=" + Id + ", ReferenceValue=" + aiCalibPoints.get(0) + ", maxDiff=" + iDiffC + ", MeasureInterval=" + iCalibrationPointDelayC + "]" );
                 try
                 {
                     barometer.setAirPressureCallbackPeriod(iCalibrationPointDelayC);
@@ -173,7 +176,7 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
 
             if(aiCalibPoints.get(0) + iDiffC < iAirPressure || aiCalibPoints.get(0) - iDiffC > iAirPressure) {
 
-                main.The17HerzApplication.logInfo("Calibration failed [ReferenceValue=" + aiCalibPoints.get(0) + ", airPressure=" + iAirPressure + ", maxDiff=" + iDiffC + "]" );
+                main.The17HerzApplication.logInfo("Calibration failed [SensorID=" + Id + ", ReferenceValue=" + aiCalibPoints.get(0) + ", airPressure=" + iAirPressure + ", maxDiff=" + iDiffC + "]" );
 
                 iActiveCalibPoint = 0;
                 aiCalibPoints.clear();
@@ -188,7 +191,6 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
         try
         {
             barometer.setAirPressureCallbackThreshold('o', iAirPressure - iDiffC, iAirPressure + iDiffC);
-            main.The17HerzApplication.logInfo("Neuer Kalibwert : " + iAirPressure + " | Von: " + Id);
         }
         catch (TimeoutException e)
         {
