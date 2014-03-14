@@ -10,9 +10,8 @@ import com.tinkerforge.BrickletBarometer.AirPressureReachedListener;
 import main.The17HerzApplication;
 
 import java.text.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+
 
 /**
  * This class is responsible for receiving, processing and delegating data about
@@ -22,7 +21,7 @@ import java.util.List;
  * 
  */
 public class BarometerApplication extends AbstractTinkerforgeApplication
-		implements AirPressureListener, AirPressureReachedListener {
+		implements AirPressureReachedListener {
 
     public static String formatNumber(Integer number, String unit, double kommastellen) {
         double doubleNumber = (double)number / Math.pow(10, kommastellen);
@@ -60,12 +59,16 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
 
     private final int iDiffC = 200; //0.2 mBar
     private final int iCalibrationPointsC = 40;
-    private final int iCalibrationPointDelayC = 50;
+    private final int iCalibrationPointDelayC = 5;
     private final int iCalibrationDelayC = 60000;
-    private ArrayList<Integer> aiCalibPoints = new ArrayList<Integer>() ;
 
 	public BarometerApplication(String sUid) {
         this.sUid = sUid;
+
+        Timer CalibTimer = new Timer();
+
+        CalibTimer.scheduleAtFixedRate(new BarometerCalibration(), 0, iCalibrationDelayC);
+
 	}
 
 	@Override
@@ -76,8 +79,6 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
         {
 			final BrickletBarometer barometerBrick = (BrickletBarometer) device;
             barometer = null;
-            barometerBrick.removeAirPressureListener(this);
-            //barometerBrick.removeAltitudeListener(this);
             barometerBrick.removeAirPressureReachedListener(this);
 		}
 
@@ -92,9 +93,6 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
             if ((TinkerforgeDevice.getDevice(device) == TinkerforgeDevice.Barometer) &&
                     device.getIdentity().uid.equalsIgnoreCase(sUid) )
             {
-                barometer = (BrickletBarometer) device;
-                barometer.addAirPressureListener(this);
-                //barometer.addAltitudeListener(this);
                 barometer.addAirPressureReachedListener(this);
 
                 Id = device.getIdentity().uid;
@@ -106,86 +104,7 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
         }
 	}
 
-    @Override
-    public void airPressure(int iAirPressure) {
-        if (iAirPressure > iMaxAirPressure)
-        {
-            iMaxAirPressure = iAirPressure;
-            //System.out.println(new Date().toString() + ": Air Pressure Max " + Id + ": " + iAirPressure);
-        }
-        if (iAirPressure < iMinAirPressure)
-        {
-            iMinAirPressure = iAirPressure;
-            //System.out.println(new Date().toString() + ": Air Pressure Min " + Id + ": " + iAirPressure);
-        }
 
-        if (++iActiveCalibPoint > iCalibrationPointsC)
-        {
-            // Durchschnitt der Kalibrationspunkte errechnen
-            long sum = 0;
-            for (Integer point: aiCalibPoints)
-            {
-                sum += point;
-            }
-            if (aiCalibPoints.size() > 0)
-            {
-                int iThresholdValue = (int) (sum / aiCalibPoints.size());
-
-                main.The17HerzApplication.logInfo("Calibration succeeded [SensorID=" + Id + ", NewThresholdValue=" + iThresholdValue + ", MeasurePointCount=" + aiCalibPoints.size() + "]" );
-
-                setThreshold(iThresholdValue);
-            }
-
-            // Kalibration zurücksetzen
-            iActiveCalibPoint  = 0;
-            aiCalibPoints.clear();
-
-            main.The17HerzApplication.logInfo("Calibration reseted [SensorID=" + Id + "]" );
-
-            try
-            {
-                barometer.setAirPressureCallbackPeriod(iCalibrationDelayC);
-            }
-            catch (TimeoutException e)
-            {
-                e.printStackTrace();
-            }
-            catch (NotConnectedException e)
-            {
-                e.printStackTrace();
-            }
-        }
-        else
-        {
-            aiCalibPoints.add(iAirPressure);
-            main.The17HerzApplication.logInfo("Add Calibration point [id=" + Id + ", value="+ iAirPressure + ", iActiveCalibPoint=" + iActiveCalibPoint + "]");
-
-            if (iActiveCalibPoint == 1) {
-                main.The17HerzApplication.logInfo("Calibration started [SensorID=" + Id + ", ReferenceValue=" + aiCalibPoints.get(0) + ", maxDiff=" + iDiffC + ", MeasureInterval=" + iCalibrationPointDelayC + "]" );
-                try
-                {
-                    barometer.setAirPressureCallbackPeriod(iCalibrationPointDelayC);
-                }
-                catch (TimeoutException e)
-                {
-                    e.printStackTrace();
-                }
-                catch (NotConnectedException e)
-                {
-                    e.printStackTrace();
-                }
-            }
-
-            if(aiCalibPoints.get(0) + iDiffC < iAirPressure || aiCalibPoints.get(0) - iDiffC > iAirPressure) {
-
-                main.The17HerzApplication.logInfo("Calibration failed [SensorID=" + Id + ", ReferenceValue=" + aiCalibPoints.get(0) + ", airPressure=" + iAirPressure + ", maxDiff=" + iDiffC + "]" );
-
-                iActiveCalibPoint = 0;
-                aiCalibPoints.clear();
-            }
-        }
-
-    }
 
 
     public void setThreshold (int iAirPressure)
@@ -244,4 +163,70 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
 		final BarometerApplication other = (BarometerApplication) obj;
 		return this == other;
 	}
+
+    public BrickletBarometer getBarometer() {
+        return barometer;
+    }
+
+    private class BarometerCalibration extends TimerTask implements AirPressureListener
+    {
+
+        private final long lCalibDurationC = 2000;
+        private long StartTime;
+
+        private ArrayList<Integer> aiCalibPoints = new ArrayList<Integer>() ;
+
+        BarometerCalibration() {
+            barometer.addAirPressureListener(this);
+        }
+
+        @Override
+        public void run()
+        {
+            StartTime = System.currentTimeMillis();
+            main.The17HerzApplication.logInfo("Calibration started [SensorID=" + Id + ", ReferenceValue=" + aiCalibPoints.get(0) + ", maxDiff=" + iDiffC + ", MeasureInterval=" + iCalibrationPointDelayC + "]" );
+
+            aiCalibPoints.clear();
+            while ((System.currentTimeMillis() - StartTime) < lCalibDurationC)
+            {
+
+            }
+
+            // Durchschnitt der Kalibrationspunkte errechnen
+            long sum = 0;
+            for (Integer point: aiCalibPoints)
+            {
+
+                sum += point;
+            }
+            if (aiCalibPoints.size() > 0)
+            {
+                int iThresholdValue = (int) (sum / aiCalibPoints.size());
+
+                main.The17HerzApplication.logInfo("Calibration succeeded [SensorID=" + Id + ", NewThresholdValue=" + iThresholdValue + ", MeasurePointCount=" + aiCalibPoints.size() + "]" );
+
+                setThreshold(iThresholdValue);
+            }
+
+            barometer.removeAirPressureListener(this);
+
+        }
+
+        @Override
+        public void airPressure(int iAirPressure)
+        {
+            aiCalibPoints.add(iAirPressure);
+            main.The17HerzApplication.logInfo("Add Calibration point [id=" + Id + ", value=" + iAirPressure + ", iActiveCalibPoint=" + iActiveCalibPoint + "]");
+
+
+
+            if(aiCalibPoints.get(0) + iDiffC < iAirPressure || aiCalibPoints.get(0) - iDiffC > iAirPressure) {
+
+                main.The17HerzApplication.logInfo("Calibration failed [SensorID=" + Id + ", ReferenceValue=" + aiCalibPoints.get(0) + ", airPressure=" + iAirPressure + ", maxDiff=" + iDiffC + "]" );
+
+                aiCalibPoints.clear();
+                StartTime = System.currentTimeMillis();
+            }
+        }
+    }
 }
