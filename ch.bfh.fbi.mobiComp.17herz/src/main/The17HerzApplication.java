@@ -111,19 +111,31 @@ public class The17HerzApplication extends AbstractTinkerforgeApplication impleme
 
         DoorEvent currentEvent = new DoorEvent(source, airPressure);
 
+        Boolean eventLogged = false;
 
         // check last events
-        if(events.size() == 0) {
-            currentEvent.logEvent();
-        }
-        else if(events.size() > 0) {
 
-            // get last event from same sensor
-//            for(DoorEvent event : events) {
-//                if(event.getBarometerId().equals(currentEvent.getBarometerId())) {
-//
-//                }
-//            }
+        if(events.size() > 0) {
+
+            // get last event from same sensor, and if different, log it
+            for (final DoorEvent event : new ListReverser<DoorEvent>(events)) {
+                if(event.getBarometerId().equals(currentEvent.getBarometerId())) {
+                    if(event.isUp != currentEvent.isUp) {
+                        currentEvent.logEvent("same sensor, other direction");
+                        eventLogged = true;
+                        break;
+                    }
+                }
+                else if(Math.abs(event.getTimestamp().getTime() - currentEvent.getTimestamp().getTime()) < 10 ) { // not the same sensor, but between 10ms
+                    currentEvent.logEvent("other sensor had same event");
+                    eventLogged = true;
+                    break;
+                }
+            }
+        }
+
+        if(!eventLogged) {
+            currentEvent.logEvent("no combination of event detected, so just log it");
         }
 
         events.add(currentEvent);
@@ -185,8 +197,8 @@ public class The17HerzApplication extends AbstractTinkerforgeApplication impleme
             return isUp;
         }
 
-        public void logEvent() {
-            logInfo((isUp ? "Close" : "Open") + " detected! " + this);
+        public void logEvent(String reason) {
+            logInfo((isUp ? "Close" : "Open") + " detected! Reason: " + reason + ". " + this);
         }
 
         @Override

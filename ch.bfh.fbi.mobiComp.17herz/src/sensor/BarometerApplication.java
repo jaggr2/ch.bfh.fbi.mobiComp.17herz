@@ -192,7 +192,7 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
             }
 
             StartTime = System.currentTimeMillis();
-            main.The17HerzApplication.logInfo("Calibration started [SensorID=" + Id + ", ReferenceValue=" + ((aiCalibPoints.size() > 0) ? aiCalibPoints.get(0) : 0) + ", maxDiff=" + iDiffC + ", MeasureInterval=" + iCalibrationPointDelayC + "]" );
+            main.The17HerzApplication.logInfo("Calibration started [SensorID=" + Id + ", ReferenceValue=" + ((aiCalibPoints.size() > 0) ? aiCalibPoints.get(0) : 0) + ", maxDiff=" + iCalibDiffC + ", MeasureInterval=" + iCalibrationPointDelayC + "]" );
 
             synchronized (lock)
             {
