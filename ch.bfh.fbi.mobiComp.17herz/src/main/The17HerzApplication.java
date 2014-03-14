@@ -21,26 +21,21 @@ public class The17HerzApplication extends AbstractTinkerforgeApplication impleme
     public static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
 
 
-    public HashMap<String, AbstractTinkerforgeApplication> connectedApps = new HashMap<String, AbstractTinkerforgeApplication>();
+    public HashMap<Device, AbstractTinkerforgeApplication> connectedApps = new HashMap<Device, AbstractTinkerforgeApplication>();
 
 	@Override
 	public void deviceDisconnected(final TinkerforgeStackAgent tinkerforgeStackAgent, final Device device) {
-        try
-        {
-            String uid = device.getIdentity().uid;
 
-            if(connectedApps.containsKey(uid)) {
-                super.removeTinkerforgeApplication(connectedApps.get(uid));
-                connectedApps.remove(uid);
-                System.out.println("Device " + device + " ID: " + uid + " disconnected and connected application removed!");
-            }
-            else {
-                System.out.println("Device " + device + " ID: " + uid + " disconnected without connected application!");
-            }
+        if(connectedApps.containsKey(device)) {
+
+            super.removeTinkerforgeApplication(connectedApps.get(device));
+
+            connectedApps.remove(device);
+
+            System.out.println("Device " + device + " disconnected and connected application removed!");
         }
-        catch (TinkerforgeException ex)
-        {
-            System.out.println("ERROR: Failed to disconnect Device " + device + "!");
+        else {
+            System.out.println("Device " + device + " disconnected without connected application!");
         }
 	}
 
@@ -52,10 +47,10 @@ public class The17HerzApplication extends AbstractTinkerforgeApplication impleme
             {
                 BarometerApplication app = new BarometerApplication(device.getIdentity().uid);
                 app.addDoorEventListener(this);
-                addApplication(device.getIdentity().uid, app);
+                addApplication(device, app);
             }
             else if(TinkerforgeDevice.getDevice(device) == TinkerforgeDevice.Joystick) {
-                addApplication(device.getIdentity().uid, new JoystickApplication(device.getIdentity().uid));
+                addApplication(device, new JoystickApplication(device.getIdentity().uid));
             }
             else {
                 System.out.println("INFO: Device " + device + " with ID " + device.getIdentity().uid + " has no connectable Application!");
@@ -67,12 +62,12 @@ public class The17HerzApplication extends AbstractTinkerforgeApplication impleme
         }
 	}
 
-    public void addApplication(final String uid, final AbstractTinkerforgeApplication newApplication) {
-        connectedApps.put(uid, newApplication);
+    public void addApplication(final Device device, final AbstractTinkerforgeApplication newApplication) {
+        connectedApps.put(device, newApplication);
 
         super.addTinkerforgeApplication(newApplication);
 
-        System.out.println("Application  " + newApplication + " connected with Device ID: " + uid + " !");
+        System.out.println("Application  " + newApplication + " connected with Device " + device + " !");
     }
 
 	@Override
