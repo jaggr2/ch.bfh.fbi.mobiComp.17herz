@@ -45,7 +45,7 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
     private String sUid;
 
     private BrickletBarometer barometer;
-    private int iActiveCalibPoint = 0;
+    private boolean waitForCalib = false;
 
     private final int iDiffC = 200; //0.2 mBar
     private final int iCalibrationPointDelayC = 5;
@@ -105,37 +105,22 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
 	}
 
 
-
-
-    public void setThreshold (int iAirPressure)
-    {
-        try
-        {
-            barometer.setAirPressureCallbackThreshold('o', iAirPressure - iDiffC, iAirPressure + iDiffC);
-        }
-        catch (TimeoutException e)
-        {
-            e.printStackTrace();
-        }
-        catch (NotConnectedException e)
-        {
-            e.printStackTrace();
-        }
-
-    }
-
     @Override
     public void airPressureReached(int iAirPressure)
     {
         try {
 
+            if (!waitForCalib)
+            {
+                main.The17HerzApplication.logInfo("Ereignis bei " + formatNumber(iAirPressure, "mBar", 3) + " | Von: " + Id + barometer.getAirPressureCallbackThreshold().toString());
 
-            main.The17HerzApplication.logInfo("Ereignis bei " + formatNumber(iAirPressure, "mBar", 3) + " | Von: " + Id + barometer.getAirPressureCallbackThreshold().toString());
+                new Thread(barometerCalibration).start();
 
-            setThreshold(iAirPressure);
+                waitForCalib = true;
 
-            for(IDoorEventListener listener : eventListeners) {
-                listener.doorEventHappend(this, iAirPressure);
+                for(IDoorEventListener listener : eventListeners) {
+                    listener.doorEventHappend(this, iAirPressure);
+                }
             }
         }
         catch (TimeoutException e)
@@ -275,6 +260,25 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
             {
                 barometer.removeAirPressureListener(this);
             }
+        }
+
+        public void setThreshold (int iAirPressure)
+        {
+            try
+            {
+                barometer.setAirPressureCallbackThreshold('o', iAirPressure - iDiffC, iAirPressure + iDiffC);
+            }
+            catch (TimeoutException e)
+            {
+                e.printStackTrace();
+            }
+            catch (NotConnectedException e)
+            {
+                e.printStackTrace();
+            }
+
+            waitForCalib = false;
+
         }
     }
 }
