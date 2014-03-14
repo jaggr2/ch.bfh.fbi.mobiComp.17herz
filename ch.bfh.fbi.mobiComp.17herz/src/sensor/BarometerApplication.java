@@ -55,7 +55,7 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
     private String Id;
     private String sUid;
 
-    private  BrickletBarometer barometer;
+    private BrickletBarometer barometer;
     private int iActiveCalibPoint = 0;
 
     private final int iDiffC = 200; //0.2 mBar
@@ -119,7 +119,7 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
             //System.out.println(new Date().toString() + ": Air Pressure Min " + Id + ": " + iAirPressure);
         }
 
-        if (++iActiveCalibPoint == iCalibrationPointsC)
+        if (++iActiveCalibPoint > iCalibrationPointsC)
         {
             // Durchschnitt der Kalibrationspunkte errechnen
             long sum = 0;
@@ -135,9 +135,7 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
 
                 setThreshold(iThresholdValue);
             }
-        }
-        else if (iActiveCalibPoint > iCalibrationPointsC)
-        {
+
             // Kalibration zurücksetzen
             iActiveCalibPoint  = 0;
             aiCalibPoints.clear();
