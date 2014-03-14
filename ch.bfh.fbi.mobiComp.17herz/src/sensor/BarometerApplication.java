@@ -62,13 +62,13 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
     private final int iCalibrationPointDelayC = 5;
     private final int iCalibrationDelayC = 60000;
 
+    private BarometerCalibration barometerCalibration;
+    private Timer CalibTimer;
+
 	public BarometerApplication(String sUid) {
         this.sUid = sUid;
 
-        Timer CalibTimer = new Timer();
-
-        CalibTimer.scheduleAtFixedRate(new BarometerCalibration(), 0, iCalibrationDelayC);
-
+        CalibTimer = new Timer();
 	}
 
 	@Override
@@ -80,6 +80,7 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
 			final BrickletBarometer barometerBrick = (BrickletBarometer) device;
             barometer = null;
             barometerBrick.removeAirPressureReachedListener(this);
+            CalibTimer.cancel();
 		}
 
 	}
@@ -93,11 +94,13 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
             if ((TinkerforgeDevice.getDevice(device) == TinkerforgeDevice.Barometer) &&
                     device.getIdentity().uid.equalsIgnoreCase(sUid) )
             {
+                barometer = (BrickletBarometer) device;
                 barometer.addAirPressureReachedListener(this);
 
                 Id = device.getIdentity().uid;
-                barometer.setAirPressureCallbackPeriod(iCalibrationPointDelayC);
+                barometerCalibration = new BarometerCalibration();
 
+                CalibTimer.scheduleAtFixedRate(barometerCalibration, 0, iCalibrationDelayC);
             }
         }
         catch (final TinkerforgeException ex) {
@@ -164,10 +167,6 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
 		return this == other;
 	}
 
-    public BrickletBarometer getBarometer() {
-        return barometer;
-    }
-
     private class BarometerCalibration extends TimerTask implements AirPressureListener
     {
 
@@ -183,8 +182,21 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
         @Override
         public void run()
         {
+            try
+            {
+                barometer.setAirPressureCallbackPeriod(iCalibrationPointDelayC);
+            }
+            catch (TimeoutException e)
+            {
+                e.printStackTrace();
+            }
+            catch (NotConnectedException e)
+            {
+                e.printStackTrace();
+            }
+
             StartTime = System.currentTimeMillis();
-            main.The17HerzApplication.logInfo("Calibration started [SensorID=" + Id + ", ReferenceValue=" + aiCalibPoints.get(0) + ", maxDiff=" + iDiffC + ", MeasureInterval=" + iCalibrationPointDelayC + "]" );
+            main.The17HerzApplication.logInfo("Calibration started [SensorID=" + Id + ", ReferenceValue=" + ((aiCalibPoints.size() > 0) ? aiCalibPoints.get(0) : 0) + ", maxDiff=" + iDiffC + ", MeasureInterval=" + iCalibrationPointDelayC + "]" );
 
             aiCalibPoints.clear();
             while ((System.currentTimeMillis() - StartTime) < lCalibDurationC)
@@ -208,7 +220,10 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
                 setThreshold(iThresholdValue);
             }
 
-            barometer.removeAirPressureListener(this);
+            if (barometer != null)
+            {
+                barometer.removeAirPressureListener(this);
+            }
 
         }
 
