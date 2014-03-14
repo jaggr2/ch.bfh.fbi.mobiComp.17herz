@@ -102,7 +102,7 @@ public class The17HerzApplication extends AbstractTinkerforgeApplication impleme
     }
 
     @Override
-    public void doorEventHappend(BarometerApplication source) {
+    public void doorEventHappend(BarometerApplication source, Integer airPressure) {
         System.out.println("doorEventHappend!");
     }
 

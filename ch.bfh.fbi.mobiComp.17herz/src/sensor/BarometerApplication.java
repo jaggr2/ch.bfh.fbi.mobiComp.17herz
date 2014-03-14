@@ -125,6 +125,10 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
             main.The17HerzApplication.logInfo("Ereignis bei " + formatNumber(iAirPressure, "mBar", 3) + " | Von: " + Id + barometer.getAirPressureCallbackThreshold().toString());
 
             setThreshold(iAirPressure);
+
+            for(IDoorEventListener listener : eventListeners) {
+                listener.doorEventHappend(this, iAirPressure);
+            }
         }
         catch (TimeoutException e)
         {
@@ -161,6 +165,7 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
 
         Object lock = new Object();
         private final long lCalibDurationC = 2000;
+        private final Integer iCalibDiffC = 50;
         private long StartTime;
 
         private ArrayList<Integer> aiCalibPoints = new ArrayList<Integer>() ;
@@ -245,7 +250,7 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
 
 
 
-                if(aiCalibPoints.get(0) + iDiffC < iAirPressure || aiCalibPoints.get(0) - iDiffC > iAirPressure) {
+                if(aiCalibPoints.get(0) + iCalibDiffC < iAirPressure || aiCalibPoints.get(0) - iCalibDiffC > iAirPressure) {
 
                     main.The17HerzApplication.logInfo("Calibration failed [SensorID=" + Id + ", ReferenceValue=" + aiCalibPoints.get(0) + ", airPressure=" + iAirPressure + ", maxDiff=" + iDiffC + "]" );
 

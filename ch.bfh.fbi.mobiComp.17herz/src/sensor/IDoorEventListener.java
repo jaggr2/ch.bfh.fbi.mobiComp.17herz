@@ -8,5 +8,5 @@ package sensor;
  */
 public interface IDoorEventListener {
 
-    public void doorEventHappend(BarometerApplication source);
+    public void doorEventHappend(BarometerApplication source, Integer airPressure);
 }
