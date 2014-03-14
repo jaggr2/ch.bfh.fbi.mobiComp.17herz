@@ -154,6 +154,29 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
         else
         {
             aiCalibPoints.add(iAirPressure);
+
+            if (iActiveCalibPoint == 1) {
+                try
+                {
+                    barometer.setAirPressureCallbackPeriod(iCalibrationPointDelayC);
+                }
+                catch (TimeoutException e)
+                {
+                    e.printStackTrace();
+                }
+                catch (NotConnectedException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+
+            if(aiCalibPoints.get(0) + iDiffC < iAirPressure || aiCalibPoints.get(0) - iDiffC > iAirPressure) {
+
+                main.The17HerzApplication.logInfo("Fuck, Calibration failed [ReferenceValue=" + aiCalibPoints.get(0) + ", airPressure=" + iAirPressure + ", maxDiff=" + iDiffC + "]" );
+
+                iActiveCalibPoint = 0;
+                aiCalibPoints.clear();
+            }
         }
 
     }
