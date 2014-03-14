@@ -5,9 +5,7 @@ import ch.quantasy.tinkerforge.tinker.application.implementation.AbstractTinkerf
 import ch.quantasy.tinkerforge.tinker.core.implementation.TinkerforgeDevice;
 import com.tinkerforge.*;
 import com.tinkerforge.BrickletBarometer.AirPressureListener;
-import com.tinkerforge.BrickletBarometer.AltitudeListener;
 import com.tinkerforge.BrickletBarometer.AirPressureReachedListener;
-import main.The17HerzApplication;
 
 import java.text.*;
 import java.util.*;
@@ -43,14 +41,6 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
         eventListeners.remove( observer );
     }
 
-
-
-    private int iMaxAltitude = 0;
-    private int iMinAltitude = 500000;
-
-    private int iMaxAirPressure = 0;
-    private int iMinAirPressure = 10000000;
-
     private String Id;
     private String sUid;
 
@@ -58,7 +48,6 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
     private int iActiveCalibPoint = 0;
 
     private final int iDiffC = 200; //0.2 mBar
-    private final int iCalibrationPointsC = 40;
     private final int iCalibrationPointDelayC = 5;
     private final int iCalibrationDelayC = 60000;
 
@@ -220,11 +209,18 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
                 setThreshold(iThresholdValue);
             }
 
-            if (barometer != null)
+            try
             {
-                barometer.removeAirPressureListener(this);
+                barometer.setAirPressureCallbackPeriod(0);
             }
-
+            catch (TimeoutException e)
+            {
+                e.printStackTrace();
+            }
+            catch (NotConnectedException e)
+            {
+                e.printStackTrace();
+            }
         }
 
         @Override
@@ -241,6 +237,15 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
 
                 aiCalibPoints.clear();
                 StartTime = System.currentTimeMillis();
+            }
+        }
+
+        @Override
+        protected void finalize()
+        {
+            if (barometer != null)
+            {
+                barometer.removeAirPressureListener(this);
             }
         }
     }
