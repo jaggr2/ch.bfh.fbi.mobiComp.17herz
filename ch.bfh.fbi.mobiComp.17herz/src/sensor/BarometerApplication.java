@@ -47,12 +47,14 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
     private BrickletBarometer barometer;
     private boolean waitForCalib = true;
 
-    private final int iDiffC = 100; //0.2 mBar
+    private final int iDiffC = 100; //0.1 mBar
     private final int iCalibrationPointDelayC = 5;
     private final int iCalibrationDelayC = 60000;
 
     private BarometerCalibration barometerCalibration;
     private Timer CalibTimer;
+
+    private long lastEventTime;
 
 	public BarometerApplication(String sUid) {
         this.sUid = sUid;
@@ -115,6 +117,8 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
             {
                 main.The17HerzApplication.logInfo("Ereignis bei " + formatNumber(iAirPressure, "mBar", 3) + " | Von: " + Id + barometer.getAirPressureCallbackThreshold().toString());
 
+                lastEventTime = System.currentTimeMillis();
+
                 for(IDoorEventListener listener : eventListeners) {
                     listener.doorEventHappend(this, iAirPressure);
                 }
@@ -134,6 +138,9 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
         }
     }
 
+    public long getLastEventTime() {
+        return lastEventTime;
+    }
 	@Override
 	public int hashCode() {
 		return 0;
@@ -228,18 +235,18 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
                 }
             }
 
-            try
-            {
-                barometer.setAirPressureCallbackPeriod(0);
-            }
-            catch (TimeoutException e)
-            {
-                e.printStackTrace();
-            }
-            catch (NotConnectedException e)
-            {
-                e.printStackTrace();
-            }
+//            try
+//            {
+//                barometer.setAirPressureCallbackPeriod(0);
+//            }
+//            catch (TimeoutException e)
+//            {
+//                e.printStackTrace();
+//            }
+//            catch (NotConnectedException e)
+//            {
+//                e.printStackTrace();
+//            }
 
             calibInProgress = false;
         }

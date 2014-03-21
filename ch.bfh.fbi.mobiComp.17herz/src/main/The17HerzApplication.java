@@ -115,27 +115,44 @@ public class The17HerzApplication extends AbstractTinkerforgeApplication impleme
 
         // check last events
 
-        if(events.size() > 0) {
+//        if(events.size() > 0) {
+//
+//            // get last event from same sensor, and if different, log it
+//            for (final DoorEvent event : new ListReverser<DoorEvent>(events)) {
+//                if(event.getBarometerId().equals(currentEvent.getBarometerId())) {
+//                    if(event.isUp != currentEvent.isUp) {
+//                        currentEvent.logEvent("same sensor, other direction");
+//                        eventLogged = true;
+//                        break;
+//                    }
+//                }
+//                else if(Math.abs(event.getTimestamp().getTime() - currentEvent.getTimestamp().getTime()) < 200 ) { // not the same sensor, but between 10ms
+//                    currentEvent.logEvent("other sensor had same event");
+//                    eventLogged = true;
+//                    break;
+//                }
+//            }
+//        }
+//
+//        if(!eventLogged) {
+//            currentEvent.logEvent("no combination of event detected, so just log it");
+//        }
 
-            // get last event from same sensor, and if different, log it
-            for (final DoorEvent event : new ListReverser<DoorEvent>(events)) {
-                if(event.getBarometerId().equals(currentEvent.getBarometerId())) {
-                    if(event.isUp != currentEvent.isUp) {
-                        currentEvent.logEvent("same sensor, other direction");
-                        eventLogged = true;
-                        break;
-                    }
-                }
-                else if(Math.abs(event.getTimestamp().getTime() - currentEvent.getTimestamp().getTime()) < 10 ) { // not the same sensor, but between 10ms
-                    currentEvent.logEvent("other sensor had same event");
-                    eventLogged = true;
-                    break;
-                }
-            }
+        boolean TimeDiffToHigh = false;
+        for (AbstractTinkerforgeApplication app : connectedApps.values())
+        {
+             if (app instanceof BarometerApplication)
+             {
+                 if ((source.getLastEventTime() - ((BarometerApplication) app).getLastEventTime()) > 200 )
+                 {
+                       TimeDiffToHigh = true;
+                 }
+             }
         }
 
-        if(!eventLogged) {
-            currentEvent.logEvent("no combination of event detected, so just log it");
+        if (!TimeDiffToHigh)
+        {
+            currentEvent.logEvent("all Barometer have event");
         }
 
         events.add(currentEvent);
