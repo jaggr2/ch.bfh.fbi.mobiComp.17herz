@@ -1,8 +1,5 @@
 package main;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import ch.quantasy.tinkerforge.tinker.application.implementation.AbstractTinkerforgeApplication;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -14,19 +11,29 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import sensor.BarometerApplication;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  */
 public class GUIApplication extends Application {
 
-	public GUIApplication() {
-
-	}
-
-    public static List<Stage> stages = new LinkedList<Stage>();
-
     public static final int MAX_DATA_POINTS = 1000;
+    public static List<Stage> stages = new LinkedList<Stage>();
     private NumberAxis xAxis;
     private NumberAxis yAxis;
+    public GUIApplication() {
+
+    }
+
+    public static void finish() {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        });
+    }
 
     private NumberAxis initXAxis() {
         final NumberAxis xAxis = new NumberAxis(0, MAX_DATA_POINTS, MAX_DATA_POINTS / 10);
@@ -71,38 +78,29 @@ public class GUIApplication extends Application {
     }
 
     @Override
-	public void start(final Stage primaryStage) throws Exception {
-		// primaryStage.show();
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
+    public void start(final Stage primaryStage) throws Exception {
+        // primaryStage.show();
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
 
                 xAxis = initXAxis();
                 yAxis = initYAxis();
                 final LineChart<Number, Number> chart = initChart();
 
                 // Chart Series
-                for(AbstractTinkerforgeApplication application : The17HerzApplication.connectedApps.values()) {
-                    if(application instanceof BarometerApplication) {
-                        BarometerApplication barometerApplication = (BarometerApplication)application;
+                for (AbstractTinkerforgeApplication application : The17HerzApplication.connectedApps.values()) {
+                    if (application instanceof BarometerApplication) {
+                        BarometerApplication barometerApplication = (BarometerApplication) application;
                         barometerApplication.initChart(chart, xAxis, yAxis);
                     }
                 }
 
                 primaryStage.setScene(new Scene(chart));
                 primaryStage.show();
-			}
-		});
+            }
+        });
 
-	}
-
-	public static void finish() {
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-
-			}
-		});
-	}
+    }
 
 }
