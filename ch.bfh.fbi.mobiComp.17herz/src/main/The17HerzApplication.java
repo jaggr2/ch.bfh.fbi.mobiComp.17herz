@@ -9,8 +9,6 @@ import com.tinkerforge.Device;
 import com.tinkerforge.NotConnectedException;
 import com.tinkerforge.TimeoutException;
 import com.tinkerforge.TinkerforgeException;
-import gui.view.GUIApplication;
-import javafx.scene.chart.XYChart;
 import sensor.BarometerApplication;
 import sensor.IDoorEventListener;
 import sensor.JoystickApplication;

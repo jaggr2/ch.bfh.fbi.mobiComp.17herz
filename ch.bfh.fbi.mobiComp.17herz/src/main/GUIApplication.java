@@ -1,21 +1,17 @@
-package gui.view;
+package main;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
 import ch.quantasy.tinkerforge.tinker.application.implementation.AbstractTinkerforgeApplication;
-import gui.BarometerApplication2;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-import main.The17HerzApplication;
 import sensor.BarometerApplication;
 
 /**

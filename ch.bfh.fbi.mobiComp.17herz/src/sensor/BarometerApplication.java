@@ -6,15 +6,11 @@ import ch.quantasy.tinkerforge.tinker.core.implementation.TinkerforgeDevice;
 import com.tinkerforge.*;
 import com.tinkerforge.BrickletBarometer.AirPressureListener;
 import com.tinkerforge.BrickletBarometer.AirPressureReachedListener;
-import gui.view.GUIApplication;
+import main.GUIApplication;
 import javafx.animation.AnimationTimer;
-import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.stage.Stage;
 
 import java.text.*;
 import java.util.*;
@@ -367,16 +363,5 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
         // update Axis
         guiXAxis.setLowerBound(System.currentTimeMillis() - 20 * 1000);
         guiXAxis.setUpperBound(System.currentTimeMillis());
-        /*
-        if(this.guiSeries.getData().size() > GUIApplication.MAX_DATA_POINTS) {
-            guiXAxis.setLowerBound(this.guiSeries.getData().get(this.guiSeries.getData().size() - GUIApplication.MAX_DATA_POINTS).getXValue().doubleValue());
-            guiXAxis.setUpperBound(this.guiSeries.getData().get(this.guiSeries.getData().size() - 1).getXValue().doubleValue());
-            //this.guiDataPosition - GUIApplication.MAX_DATA_POINTS);
-            //guiXAxis.setUpperBound(this.guiDataPosition - 1);
-        }
-        else if(this.guiSeries.getData().size() > 0) {
-
-        }
-        */
     }
 }
