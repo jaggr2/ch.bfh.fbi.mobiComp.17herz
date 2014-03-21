@@ -105,7 +105,7 @@ public class GUIApplication extends Application {
                     if(application instanceof BarometerApplication) {
                         BarometerApplication barometerApplication = (BarometerApplication)application;
                         //Stage theNewStage = new Stage();
-                        barometerApplication.initChart(chart);
+                        barometerApplication.initChart(chart, xAxis, yAxis);
                         //theNewStage.show();
                     }
                 }

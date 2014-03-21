@@ -375,7 +375,16 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
         return lineChart;
     }*/
 
-    public void initChart(LineChart<Number, Number> chart) {
+    private LineChart<Number, Number> guiChart = null;
+    private NumberAxis guiYAxis = null;
+    private NumberAxis guiXAxis = null;
+
+    public void initChart(LineChart<Number, Number> chart, NumberAxis xAxis, NumberAxis yAxis) {
+
+        guiChart = chart;
+        guiYAxis = yAxis;
+        guiXAxis = xAxis;
+
         this.guiSeries = new XYChart.Series<Number, Number>();
         this.guiSeries.setName("Barometer " + this.getId());
         chart.getData().add(this.guiSeries);
@@ -428,6 +437,6 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
         }
 
         // update Axis
-        //this.xAxis.setLowerBound(this.guiDataPosition - MAX_DATA_POINTS);
+        guiXAxis.setLowerBound(this.guiDataPosition - MAX_DATA_POINTS);
     }
 }
