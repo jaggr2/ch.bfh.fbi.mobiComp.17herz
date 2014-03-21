@@ -72,8 +72,8 @@ public class GUIApplication extends Application {
             }
         };
         lineChart.setAnimated(false);
-        lineChart.setId("Live Altitude Position");
-        lineChart.setTitle("Sensor-Fusion (Altitude)");
+        lineChart.setId("Live Barometer Position");
+        lineChart.setTitle("Barometer App");
         return lineChart;
     }
 
