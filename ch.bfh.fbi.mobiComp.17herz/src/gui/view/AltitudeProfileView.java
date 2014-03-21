@@ -17,12 +17,14 @@ public class AltitudeProfileView {
 
 	private static final int MAX_DATA_POINTS = 1000;
 
+
 	private Series<Number, Number> estimatedAltitudeSeries;
 	private Series<Number, Number> barometricAltitudeSeries;
 	private int estimatedAltitudeXSeriesDataPosition = 0;
 	private int barometricAltitudeXSeriesDataPosition = 0;
 	private static ConcurrentLinkedQueue<Number> dataEstimatedAltitude = new ConcurrentLinkedQueue<Number>();
 	private static ConcurrentLinkedQueue<Number> dataBarometricAltitude = new ConcurrentLinkedQueue<Number>();
+
 
 	private NumberAxis xAxis;
 	private NumberAxis yAxis;
@@ -49,7 +51,7 @@ public class AltitudeProfileView {
 		yAxis.setTickLabelFont(Font.font("Arial", FontWeight.MEDIUM, 18));
 		yAxis.setPrefWidth(120);
 		yAxis.setAutoRanging(true);
-		yAxis.setLabel("Meters");
+		yAxis.setLabel("miliBar");
 		yAxis.setForceZeroInRange(false);
 		yAxis.setAnimated(true);
 		return yAxis;
@@ -94,13 +96,15 @@ public class AltitudeProfileView {
 		this.prepareTimeline();
 	}
 
-	public static void addEstimatedAltitudeData(final double data) {
+    /*
+	public static void addEstimatedAltitudeData(final  double data) {
 		AltitudeProfileView.dataEstimatedAltitude.add(data);
 	}
 
 	public static void addBarometricAltitudeData(final double data) {
 		AltitudeProfileView.dataBarometricAltitude.add(data);
 	}
+	*/
 
 	// Timeline gets called in the JavaFX Main thread
 	private void prepareTimeline() {

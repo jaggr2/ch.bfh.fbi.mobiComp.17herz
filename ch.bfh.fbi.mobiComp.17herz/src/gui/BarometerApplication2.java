@@ -11,7 +11,7 @@ import com.tinkerforge.Device;
 import com.tinkerforge.NotConnectedException;
 import com.tinkerforge.TimeoutException;
 
-public class BarometerApplication extends AbstractTinkerforgeApplication implements AltitudeListener{
+public class BarometerApplication2 extends AbstractTinkerforgeApplication implements AltitudeListener{
 	private BrickletBarometer barometer;
 
 	private final long updatePeriodeInMilliseconds = 1;
@@ -69,7 +69,7 @@ public class BarometerApplication extends AbstractTinkerforgeApplication impleme
 	@Override
 	public void altitude(int altitude) {
 		//AltitudeProfileView.addBarometricAltitudeData(altitude);	
-		AltitudeProfileView.addEstimatedAltitudeData(altitude);
+		//AltitudeProfileView.addEstimatedAltitudeData(altitude);
 	}
 
 	@Override

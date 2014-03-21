@@ -9,6 +9,8 @@ import com.tinkerforge.Device;
 import com.tinkerforge.NotConnectedException;
 import com.tinkerforge.TimeoutException;
 import com.tinkerforge.TinkerforgeException;
+import gui.view.GUIApplication;
+import javafx.scene.chart.XYChart;
 import sensor.BarometerApplication;
 import sensor.IDoorEventListener;
 import sensor.JoystickApplication;
@@ -24,7 +26,7 @@ public class The17HerzApplication extends AbstractTinkerforgeApplication impleme
     public static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
 
 
-    public HashMap<Device, AbstractTinkerforgeApplication> connectedApps = new HashMap<Device, AbstractTinkerforgeApplication>();
+    public static HashMap<Device, AbstractTinkerforgeApplication> connectedApps = new HashMap<Device, AbstractTinkerforgeApplication>();
 
 	@Override
 	public void deviceDisconnected(final TinkerforgeStackAgent tinkerforgeStackAgent, final Device device) {
@@ -95,6 +97,13 @@ public class The17HerzApplication extends AbstractTinkerforgeApplication impleme
      */
     public static void main(final String[] args) throws Exception {
         final The17HerzApplication the17HerzApplication = new The17HerzApplication();
+
+        new Thread() {
+            @Override
+            public void run() {
+                javafx.application.Application.launch(GUIApplication.class, args);
+            }
+        }.start();
 
         TinkerforgeStackAgency.getInstance().getStackAgent(BARO_SENSOR).addApplication(the17HerzApplication);
 

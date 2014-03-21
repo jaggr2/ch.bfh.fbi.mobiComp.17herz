@@ -19,7 +19,7 @@ public class BarometerManager {
 						args);
 			}
 		}.start();
-		final BarometerApplication application = new BarometerApplication();
+		final BarometerApplication2 application = new BarometerApplication2();
 		agent1.addApplication(application);
 		System.in.read();
 		agent1.removeApplication(application);
