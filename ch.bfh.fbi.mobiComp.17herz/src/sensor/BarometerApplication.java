@@ -28,7 +28,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * 
  */
 public class BarometerApplication extends AbstractTinkerforgeApplication
-		implements AirPressureReachedListener {
+		implements AirPressureReachedListener, AirPressureListener {
 
     private ConcurrentLinkedQueue<Number> guiData = new ConcurrentLinkedQueue<Number>();
     private XYChart.Series<Number, Number> guiSeries;
@@ -108,7 +108,8 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
             {
                 barometer = (BrickletBarometer) device;
                 barometer.addAirPressureReachedListener(this);
-                barometer.setAveraging((short) 0, (short) 0, (short) 0);
+                barometer.addAirPressureListener(this);
+                barometer.setAveraging((short)0,(short) 0,(short) 0);
 
                 Id = device.getIdentity().uid;
                 barometerCalibration = new BarometerCalibration();
@@ -173,6 +174,11 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
 		final BarometerApplication other = (BarometerApplication) obj;
 		return this == other;
 	}
+
+    @Override
+    public void airPressure(int i) {
+        guiData.add(i);
+    }
 
     private class BarometerCalibration extends TimerTask implements AirPressureListener
     {
@@ -269,8 +275,6 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
         {
             synchronized (lock)
             {
-                guiData.add(iAirPressure);
-
                 aiCalibPoints.add(iAirPressure);
                 //main.The17HerzApplication.logInfo("Add Calibration point [id=" + Id + ", value=" + iAirPressure + ", iActiveCalibPoint=" + iActiveCalibPoint + "]");
 
