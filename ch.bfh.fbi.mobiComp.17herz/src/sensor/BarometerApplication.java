@@ -47,7 +47,7 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
     private BrickletBarometer barometer;
     private boolean waitForCalib = true;
 
-    private final int iDiffC = 200; //0.2 mBar
+    private final int iDiffC = 100; //0.2 mBar
     private final int iCalibrationPointDelayC = 5;
     private final int iCalibrationDelayC = 60000;
 
@@ -93,6 +93,7 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
             {
                 barometer = (BrickletBarometer) device;
                 barometer.addAirPressureReachedListener(this);
+                barometer.setAveraging((short)0,(short) 0,(short) 0);
 
                 Id = device.getIdentity().uid;
                 barometerCalibration = new BarometerCalibration();
@@ -192,7 +193,7 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
             }
 
             StartTime = System.currentTimeMillis();
-            main.The17HerzApplication.logInfo("Calibration started [SensorID=" + Id + ", ReferenceValue=" + ((aiCalibPoints.size() > 0) ? aiCalibPoints.get(0) : 0) + ", maxDiff=" + iCalibDiffC + ", MeasureInterval=" + iCalibrationPointDelayC + "]" );
+            //main.The17HerzApplication.logInfo("Calibration started [SensorID=" + Id + ", ReferenceValue=" + ((aiCalibPoints.size() > 0) ? aiCalibPoints.get(0) : 0) + ", maxDiff=" + iCalibDiffC + ", MeasureInterval=" + iCalibrationPointDelayC + "]" );
 
             synchronized (lock)
             {
@@ -255,7 +256,7 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
 
                 if(aiCalibPoints.get(0) + iCalibDiffC < iAirPressure || aiCalibPoints.get(0) - iCalibDiffC > iAirPressure) {
 
-                    main.The17HerzApplication.logInfo("Calibration failed [SensorID=" + Id + ", ReferenceValue=" + aiCalibPoints.get(0) + ", airPressure=" + iAirPressure + ", maxDiff=" + iDiffC + "]" );
+                    //main.The17HerzApplication.logInfo("Calibration failed [SensorID=" + Id + ", ReferenceValue=" + aiCalibPoints.get(0) + ", airPressure=" + iAirPressure + ", maxDiff=" + iCalibDiffC + "]" );
 
                     aiCalibPoints.clear();
                     StartTime = System.currentTimeMillis();
