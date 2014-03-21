@@ -28,7 +28,7 @@ public class GUIApplication extends Application {
 
     public static List<Stage> stages = new LinkedList<Stage>();
 
-    private static final int MAX_DATA_POINTS = 1000;
+    public static final int MAX_DATA_POINTS = 1000;
     private NumberAxis xAxis;
     private NumberAxis yAxis;
 
@@ -36,6 +36,7 @@ public class GUIApplication extends Application {
         final NumberAxis xAxis = new NumberAxis(0, MAX_DATA_POINTS, MAX_DATA_POINTS / 10);
         xAxis.setTickLabelFont(Font.font("Arial", FontWeight.MEDIUM, 18));
         xAxis.setForceZeroInRange(false);
+        xAxis.setLabel("timestamp");
         xAxis.setAutoRanging(false);
         return xAxis;
     }
@@ -73,22 +74,6 @@ public class GUIApplication extends Application {
         return lineChart;
     }
 
-    /*
-    public void initStage(final Stage stage) {
-        this.xAxis = this.initXAxis();
-        this.yAxis = this.initYAxis();
-        final LineChart<Number, Number> chart = this.initChart();
-
-        // Chart Series
-        this.guiSeries = new XYChart.Series<Number, Number>();
-        this.guiSeries.setName("Barometer " + this.getId());
-        chart.getData().add(this.guiSeries);
-
-        stage.setScene(new Scene(chart));
-    }
-    */
-
-
     @Override
 	public void start(final Stage primaryStage) throws Exception {
 		// primaryStage.show();
@@ -104,38 +89,12 @@ public class GUIApplication extends Application {
                 for(AbstractTinkerforgeApplication application : The17HerzApplication.connectedApps.values()) {
                     if(application instanceof BarometerApplication) {
                         BarometerApplication barometerApplication = (BarometerApplication)application;
-                        //Stage theNewStage = new Stage();
                         barometerApplication.initChart(chart, xAxis, yAxis);
-                        //theNewStage.show();
                     }
                 }
 
                 primaryStage.setScene(new Scene(chart));
                 primaryStage.show();
-
-                    /*
-                for(AbstractTinkerforgeApplication application : The17HerzApplication.connectedApps.values()) {
-                    if(application instanceof BarometerApplication) {
-                        BarometerApplication barometerApplication = (BarometerApplication)application;
-                        Stage theNewStage = new Stage();
-                        barometerApplication.initStage(theNewStage);
-                        theNewStage.show();
-                    }
-                }
-                */
-
-                //primaryStage.show();
-
-                /*
-                final Stage altitudeStage = new Stage();
-				final AltitudeProfileView e = new AltitudeProfileView(
-						altitudeStage);
-				GUIApplication.stages.add(altitudeStage);
-				
-				for (final Stage stage : GUIApplication.stages) {
-					stage.show();
-				}
-				*/
 			}
 		});
 
@@ -145,11 +104,7 @@ public class GUIApplication extends Application {
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
-/*
-				for (final Stage stage : GUIApplication.stages) {
-					stage.close();
-				}
-*/
+
 			}
 		});
 	}

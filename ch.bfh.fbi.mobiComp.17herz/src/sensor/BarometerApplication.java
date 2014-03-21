@@ -6,6 +6,7 @@ import ch.quantasy.tinkerforge.tinker.core.implementation.TinkerforgeDevice;
 import com.tinkerforge.*;
 import com.tinkerforge.BrickletBarometer.AirPressureListener;
 import com.tinkerforge.BrickletBarometer.AirPressureReachedListener;
+import gui.view.GUIApplication;
 import javafx.animation.AnimationTimer;
 import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
@@ -31,6 +32,7 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
 		implements AirPressureReachedListener, AirPressureListener {
 
     private ConcurrentLinkedQueue<Number> guiData = new ConcurrentLinkedQueue<Number>();
+    private ConcurrentLinkedQueue<Number> guiDataTime = new ConcurrentLinkedQueue<Number>();
     private XYChart.Series<Number, Number> guiSeries;
     private int guiDataPosition = 0;
 
@@ -178,6 +180,7 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
     @Override
     public void airPressure(int i) {
         guiData.add(i);
+        guiDataTime.add(System.currentTimeMillis());
     }
 
     private class BarometerCalibration extends TimerTask implements AirPressureListener
@@ -319,62 +322,6 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
         }
     }
 
-    private static final int MAX_DATA_POINTS = 1000;
-
-    /*
-	private Series<Number, Number> estimatedAltitudeSeries;
-	private Series<Number, Number> barometricAltitudeSeries;
-	private int estimatedAltitudeXSeriesDataPosition = 0;
-	private int barometricAltitudeXSeriesDataPosition = 0;
-	private static ConcurrentLinkedQueue<Number> dataEstimatedAltitude = new ConcurrentLinkedQueue<Number>();
-	private static ConcurrentLinkedQueue<Number> dataBarometricAltitude = new ConcurrentLinkedQueue<Number>();
-
-
-    private NumberAxis xAxis;
-    private NumberAxis yAxis;
-
-    private NumberAxis initXAxis() {
-        final NumberAxis xAxis = new NumberAxis(0, MAX_DATA_POINTS, MAX_DATA_POINTS / 10);
-        xAxis.setTickLabelFont(Font.font("Arial", FontWeight.MEDIUM, 18));
-        xAxis.setForceZeroInRange(false);
-        xAxis.setAutoRanging(false);
-        return xAxis;
-    }
-
-    private NumberAxis initYAxis() {
-        final NumberAxis yAxis = new NumberAxis();
-        yAxis.setTickLabelFormatter(new NumberAxis.DefaultFormatter(yAxis) {
-            @Override
-            public String toString(final Number object) {
-                return String.format("%6.2f", object);
-            }
-        });
-        yAxis.setTickLabelFont(Font.font("Arial", FontWeight.MEDIUM, 18));
-        yAxis.setPrefWidth(120);
-        yAxis.setAutoRanging(true);
-        yAxis.setLabel("miliBar");
-        yAxis.setForceZeroInRange(false);
-        yAxis.setAnimated(true);
-        return yAxis;
-    }
-
-
-    private LineChart<Number, Number> initChart() {
-        // -- Chart
-        final LineChart<Number, Number> lineChart = new LineChart<Number, Number>(
-                this.xAxis, this.yAxis) {
-            // Override to remove symbols on each data point
-            @Override
-            protected void dataItemAdded(final Series<Number, Number> series,
-                                         final int itemIndex, final Data<Number, Number> item) {
-            }
-        };
-        lineChart.setAnimated(false);
-        lineChart.setId("Live Altitude Position");
-        lineChart.setTitle("Sensor-Fusion (Altitude)");
-        return lineChart;
-    }*/
-
     private LineChart<Number, Number> guiChart = null;
     private NumberAxis guiYAxis = null;
     private NumberAxis guiXAxis = null;
@@ -399,44 +346,37 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
         }.start();
     }
 
-    /*
-    public void initStage(final Stage stage) {
-        this.xAxis = this.initXAxis();
-        this.yAxis = this.initYAxis();
-        final LineChart<Number, Number> chart = this.initChart();
-
-        // Chart Series
-        this.guiSeries = new XYChart.Series<Number, Number>();
-        this.guiSeries.setName("Barometer " + this.getId());
-        chart.getData().add(this.guiSeries);
-
-        stage.setScene(new Scene(chart));
-
-        // Timeline gets called in the JavaFX Main thread
-        // Every frame to take any data from queue and add to chart
-        new AnimationTimer() {
-            @Override
-            public void handle(final long now) {
-                addDataToSeries();
-            }
-        }.start();
-    }
-*/
     private void addDataToSeries() {
         for (int i = 0; i < 50; i++) { // -- add some new samples to the plot
             if (guiData.isEmpty()) {
                 break;
             }
-            this.guiSeries.getData().add(new LineChart.Data<Number, Number>(this.guiDataPosition++, guiData.remove()));
+            if (guiDataTime.isEmpty()) {
+                break;
+            }
+            this.guiSeries.getData().add(new LineChart.Data<Number, Number>(guiDataTime.remove(), guiData.remove()));
+            //this.guiDataPosition++;
         }
 
 
         // remove points to keep us at no more than MAX_DATA_POINTS
-        if (this.guiSeries.getData().size() > MAX_DATA_POINTS) {
-            this.guiSeries.getData().remove(0, this.guiSeries.getData().size() - MAX_DATA_POINTS);
+        if (this.guiSeries.getData().size() > GUIApplication.MAX_DATA_POINTS) {
+            this.guiSeries.getData().remove(0, this.guiSeries.getData().size() - GUIApplication.MAX_DATA_POINTS);
         }
 
         // update Axis
-        guiXAxis.setLowerBound(this.guiDataPosition - MAX_DATA_POINTS);
+        guiXAxis.setLowerBound(System.currentTimeMillis() - 20 * 1000);
+        guiXAxis.setUpperBound(System.currentTimeMillis());
+        /*
+        if(this.guiSeries.getData().size() > GUIApplication.MAX_DATA_POINTS) {
+            guiXAxis.setLowerBound(this.guiSeries.getData().get(this.guiSeries.getData().size() - GUIApplication.MAX_DATA_POINTS).getXValue().doubleValue());
+            guiXAxis.setUpperBound(this.guiSeries.getData().get(this.guiSeries.getData().size() - 1).getXValue().doubleValue());
+            //this.guiDataPosition - GUIApplication.MAX_DATA_POINTS);
+            //guiXAxis.setUpperBound(this.guiDataPosition - 1);
+        }
+        else if(this.guiSeries.getData().size() > 0) {
+
+        }
+        */
     }
 }
