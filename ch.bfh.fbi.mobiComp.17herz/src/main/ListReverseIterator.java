@@ -10,10 +10,10 @@ import java.util.ListIterator;
  * Date: 14.03.14
  * Time: 11:19
  */
-class ListReverser<T> implements Iterable<T> {
+class ListReverseIterator<T> implements Iterable<T> {
     private ListIterator<T> listIterator;
 
-    public ListReverser(List<T> wrappedList) {
+    public ListReverseIterator(List<T> wrappedList) {
         this.listIterator = wrappedList.listIterator(wrappedList.size());
     }
 

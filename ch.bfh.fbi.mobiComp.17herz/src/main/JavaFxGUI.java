@@ -16,28 +16,19 @@ import java.util.List;
 
 /**
  */
-public class GUIApplication extends Application {
+public class JavaFxGUI extends Application {
 
     public static final int MAX_DATA_POINTS = 1000;
     public static List<Stage> stages = new LinkedList<Stage>();
     private NumberAxis xAxis;
     private NumberAxis yAxis;
-    public GUIApplication() {
+    public JavaFxGUI() {
 
-    }
-
-    public static void finish() {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-
-            }
-        });
     }
 
     private NumberAxis initXAxis() {
         final NumberAxis xAxis = new NumberAxis(0, MAX_DATA_POINTS, MAX_DATA_POINTS / 10);
-        xAxis.setTickLabelFont(Font.font("Arial", FontWeight.MEDIUM, 18));
+        xAxis.setTickLabelFont(Font.font("Arial", FontWeight.MEDIUM, 14));
         xAxis.setForceZeroInRange(false);
         xAxis.setLabel("timestamp");
         xAxis.setAutoRanging(false);
@@ -52,7 +43,7 @@ public class GUIApplication extends Application {
                 return String.format("%6.2f", object);
             }
         });
-        yAxis.setTickLabelFont(Font.font("Arial", FontWeight.MEDIUM, 18));
+        yAxis.setTickLabelFont(Font.font("Arial", FontWeight.MEDIUM, 14));
         yAxis.setPrefWidth(120);
         yAxis.setAutoRanging(true);
         yAxis.setLabel("miliBar");
@@ -72,8 +63,9 @@ public class GUIApplication extends Application {
             }
         };
         lineChart.setAnimated(false);
-        lineChart.setId("Live Barometer Position");
+        lineChart.setId("Live Barometer Values");
         lineChart.setTitle("Barometer App");
+
         return lineChart;
     }
 

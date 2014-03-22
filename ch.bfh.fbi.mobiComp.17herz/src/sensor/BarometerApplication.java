@@ -6,7 +6,7 @@ import ch.quantasy.tinkerforge.tinker.core.implementation.TinkerforgeDevice;
 import com.tinkerforge.*;
 import com.tinkerforge.BrickletBarometer.AirPressureListener;
 import com.tinkerforge.BrickletBarometer.AirPressureReachedListener;
-import main.GUIApplication;
+import main.JavaFxGUI;
 import javafx.animation.AnimationTimer;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
@@ -356,8 +356,8 @@ public class BarometerApplication extends AbstractTinkerforgeApplication
 
 
         // remove points to keep us at no more than MAX_DATA_POINTS
-        if (this.guiSeries.getData().size() > GUIApplication.MAX_DATA_POINTS) {
-            this.guiSeries.getData().remove(0, this.guiSeries.getData().size() - GUIApplication.MAX_DATA_POINTS);
+        if (this.guiSeries.getData().size() > JavaFxGUI.MAX_DATA_POINTS) {
+            this.guiSeries.getData().remove(0, this.guiSeries.getData().size() - JavaFxGUI.MAX_DATA_POINTS);
         }
 
         // update Axis
