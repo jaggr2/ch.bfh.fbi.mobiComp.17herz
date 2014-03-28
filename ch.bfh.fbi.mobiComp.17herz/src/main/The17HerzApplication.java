@@ -59,7 +59,7 @@ public class The17HerzApplication extends AbstractTinkerforgeApplication impleme
         final Thread guiThread = new Thread() {
             @Override
             public void run() {
-                javafx.application.Application.launch(TestGUI.class, args);
+                javafx.application.Application.launch(JavaFxGUI.class, args);
             }
         };
         guiThread.start();
