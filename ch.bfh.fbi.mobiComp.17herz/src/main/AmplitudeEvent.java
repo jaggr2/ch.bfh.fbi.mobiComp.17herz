@@ -65,7 +65,17 @@ class AmplitudeEvent {
     }
 
     public void logEvent(String reason) {
-        The17HerzApplication.logInfo((isUp ? "Close" : "Open") + " detected! Reason: " + reason + ". " + this);
+        The17HerzApplication.logInfo((isUp ? "Up" : "Down") + " detected: " + this);
+
+        The17HerzApplication application = The17HerzApplication.getInstance();
+
+        EventLogEntry entry = new EventLogEntry((new Date()).getTime(), (isUp ? "Up" : "Down") + " detected: " + this);
+        //entry.setDescription(message);
+        //entry.setTimestamp((new Date()).getTime());
+        ;
+        for(IEventLogEntryListener listener : application.eventListeners) {
+            listener.logEventHappened(application, entry);
+        }
     }
 
     @Override

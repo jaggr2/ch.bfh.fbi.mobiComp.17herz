@@ -12,12 +12,33 @@ import sensor.IDoorEventListener;
 import sensor.JoystickApplication;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.*;
 
 
 public class The17HerzApplication extends AbstractTinkerforgeApplication implements IDoorEventListener {
+
+    private static The17HerzApplication instance = null;
+
+    public static The17HerzApplication getInstance() {
+        if(instance == null) {
+            instance = new The17HerzApplication();
+        }
+        return instance;
+    }
+
+    public final List<IEventLogEntryListener> eventListeners = new ArrayList<IEventLogEntryListener>();
+
+    public void addEventLogEntryListener( IEventLogEntryListener listener )
+    {
+        if ( ! eventListeners.contains( listener ) ) {
+            eventListeners.add( listener );
+        }
+    }
+
+    public void removeEventLogEntryListener( IEventLogEntryListener observer )
+    {
+        eventListeners.remove( observer );
+    }
 
     public static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
     // Assumes to be connected via USB
@@ -33,12 +54,12 @@ public class The17HerzApplication extends AbstractTinkerforgeApplication impleme
      * @throws Exception
      */
     public static void main(final String[] args) throws Exception {
-        final The17HerzApplication the17HerzApplication = new The17HerzApplication();
+        final The17HerzApplication the17HerzApplication = The17HerzApplication.getInstance(); // new The17HerzApplication();
 
         final Thread guiThread = new Thread() {
             @Override
             public void run() {
-                javafx.application.Application.launch(JavaFxGUI.class, args);
+                javafx.application.Application.launch(TestGUI.class, args);
             }
         };
         guiThread.start();
@@ -52,7 +73,22 @@ public class The17HerzApplication extends AbstractTinkerforgeApplication impleme
     }
 
     public static void logInfo(String message) {
+
+        /*
+        The17HerzApplication application = The17HerzApplication.getInstance();
+
+        EventLogEntry entry = new EventLogEntry((new Date()).getTime(), message);
+        //entry.setDescription(message);
+        //entry.setTimestamp((new Date()).getTime());
+        ;
+        for(IEventLogEntryListener listener : application.eventListeners) {
+            listener.logEventHappened(application, entry);
+        }
+        */
+
         System.out.println("[" + dateFormat.format(new Date()) + "]" + message);
+
+
     }
 
     @Override
@@ -105,8 +141,10 @@ public class The17HerzApplication extends AbstractTinkerforgeApplication impleme
         return this == obj;
     }
 
+
     @Override
     public void doorEventHappend(BarometerApplication source, Integer airPressure) {
+
 
         AmplitudeEvent currentEvent = new AmplitudeEvent(source, airPressure);
 

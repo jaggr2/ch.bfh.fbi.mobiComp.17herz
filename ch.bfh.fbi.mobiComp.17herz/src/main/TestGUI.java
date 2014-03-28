@@ -1,16 +1,14 @@
 package main;
 
+import ch.quantasy.tinkerforge.tinker.application.implementation.AbstractTinkerforgeApplication;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.property.SimpleLongProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
 import javafx.scene.*;
 import javafx.scene.chart.*;
-import javafx.scene.control.ListView;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -20,21 +18,93 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.LineBuilder;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import sensor.BarometerApplication;
 
-public class TestGUI extends Application {
+import java.util.LinkedList;
+import java.util.List;
+
+public class TestGUI extends Application implements IEventLogEntryListener {
     SplitPane splitPane1 = null;
     BorderPane pane1;
     BorderPane pane2;
     Line LV1, LV2;
-    XYChart.Series series1 = new XYChart.Series();
-    XYChart.Series series2 = new XYChart.Series();
+
+    public static final int MAX_DATA_POINTS = 1000;
+    public static List<Stage> stages = new LinkedList<Stage>();
+    private NumberAxis xAxis;
+    private NumberAxis yAxis;
+
+    private NumberAxis initXAxis() {
+        final NumberAxis xAxis = new NumberAxis(0, MAX_DATA_POINTS, MAX_DATA_POINTS / 10);
+        xAxis.setTickLabelFont(Font.font("Arial", FontWeight.MEDIUM, 14));
+        xAxis.setForceZeroInRange(false);
+        xAxis.setLabel("timestamp");
+        xAxis.setAutoRanging(false);
+        return xAxis;
+    }
+
+    private NumberAxis initYAxis() {
+        final NumberAxis yAxis = new NumberAxis();
+        yAxis.setTickLabelFormatter(new NumberAxis.DefaultFormatter(yAxis) {
+            @Override
+            public String toString(final Number object) {
+                return String.format("%6.2f", object);
+            }
+        });
+        yAxis.setTickLabelFont(Font.font("Arial", FontWeight.MEDIUM, 14));
+        yAxis.setPrefWidth(120);
+        yAxis.setAutoRanging(true);
+        yAxis.setLabel("miliBar");
+        yAxis.setForceZeroInRange(false);
+        yAxis.setAnimated(true);
+        return yAxis;
+    }
+
+    private LineChart<Number, Number> initChart() {
+        // -- Chart
+        final LineChart<Number, Number> lineChart = new LineChart<Number, Number>(
+                this.xAxis, this.yAxis) {
+            // Override to remove symbols on each data point
+            @Override
+            protected void dataItemAdded(final Series<Number, Number> series,
+                                         final int itemIndex, final Data<Number, Number> item) {
+            }
+        };
+        lineChart.setAnimated(false);
+        lineChart.setId("Live Barometer Values");
+        lineChart.setTitle("Barometer App");
+
+        return lineChart;
+    }
+
+    //XYChart.Series series1 = new XYChart.Series();
+    //XYChart.Series series2 = new XYChart.Series();
     private TableView table = new TableView();
+    private ObservableList<EventLogEntry> items;
 
 
     @Override
     public void start(Stage stage) {
         stage.setTitle("Lines plot");
+
+
+        xAxis = initXAxis();
+        yAxis = initYAxis();
+        final LineChart<Number, Number> chart = initChart();
+
+        // Chart Series
+        for (AbstractTinkerforgeApplication application : The17HerzApplication.connectedApps.values()) {
+            if (application instanceof BarometerApplication) {
+                BarometerApplication barometerApplication = (BarometerApplication) application;
+                barometerApplication.initChart(chart, xAxis, yAxis);
+            }
+        }
+/*
+        primaryStage.setScene(new Scene(chart));
+        primaryStage.show();
 
         final NumberAxis xAxis = new NumberAxis(1, 12, 1);
         final NumberAxis yAxis = new NumberAxis(0.53000, 0.53910, 0.0005);
@@ -49,6 +119,8 @@ public class TestGUI extends Application {
                 return String.format("%7.5f", object);
             }
         });
+
+
 
         final LineChart<Number, Number> lineChart1 = new LineChart<Number, Number>(xAxis, yAxis);
 
@@ -71,9 +143,9 @@ public class TestGUI extends Application {
         series1.getData().add(new XYChart.Data(12, 0.531035));
 
         lineChart1.getData().addAll(series1);
-
+*/
         pane1 = new BorderPane();
-        pane1.setCenter(lineChart1);
+        pane1.setCenter(chart);
 
         splitPane1 = new SplitPane();
         splitPane1.setOrientation(Orientation.VERTICAL);
@@ -114,14 +186,14 @@ public class TestGUI extends Application {
 
         table.getColumns().addAll(timeColumn, descriptionColumn);
 
-        ObservableList<EventLogEntry> items;
-        items = FXCollections.observableArrayList(
-                new EventLogEntry(1L, "test"), new EventLogEntry(2L, "test2"), new EventLogEntry(2L, "test2"), new EventLogEntry(2L, "test2"), new EventLogEntry(2L, "test2"), new EventLogEntry(2L, "test2"), new EventLogEntry(2L, "test2"), new EventLogEntry(2L, "test2"), new EventLogEntry(2L, "test2"), new EventLogEntry(2L, "test2"), new EventLogEntry(2L, "test2"), new EventLogEntry(2L, "test2"), new EventLogEntry(2L, "test2"));
+
+        items = FXCollections.observableArrayList();
+                //new EventLogEntry(1L, "test"), new EventLogEntry(2L, "test2"), new EventLogEntry(2L, "test2"), new EventLogEntry(2L, "test2"), new EventLogEntry(2L, "test2"), new EventLogEntry(2L, "test2"), new EventLogEntry(2L, "test2"), new EventLogEntry(2L, "test2"), new EventLogEntry(2L, "test2"), new EventLogEntry(2L, "test2"), new EventLogEntry(2L, "test2"), new EventLogEntry(2L, "test2"), new EventLogEntry(2L, "test2"));
 
         table.setItems(items);
 
 
-
+        The17HerzApplication.getInstance().addEventLogEntryListener(this);
 
 /*
         final BarChart<String, Number> BarChart = new BarChart<String, Number>(xAxis2, yAxis2);
@@ -184,7 +256,7 @@ public class TestGUI extends Application {
         Scene scene = new Scene(stack, 800, 600);
         LV1.endYProperty().bind(pane1.heightProperty());
         stage.setScene(scene);
-        pane1.setOnMouseMoved(mouseHandler);
+        //pane1.setOnMouseMoved(mouseHandler);
 
         stage.show();
     }
@@ -229,30 +301,8 @@ public class TestGUI extends Application {
         launch(args);
     }
 
-    public static class EventLogEntry {
-
-        private final SimpleLongProperty timestamp;
-        private final SimpleStringProperty description;
-
-        public EventLogEntry(Long timestamp, String description) {
-            this.timestamp = new SimpleLongProperty(timestamp);
-            this.description = new SimpleStringProperty(description);
-        }
-
-        public long getTimestamp() {
-            return timestamp.get();
-        }
-
-        public void setTimestamp(long timestamp) {
-            this.timestamp.set(timestamp);
-        }
-
-        public String getDescription() {
-            return description.get();
-        }
-
-        public void setDescription(String description) {
-            this.description.set(description);
-        }
+    @Override
+    public void logEventHappened(Object source, EventLogEntry entry) {
+        items.add(entry);
     }
 }
